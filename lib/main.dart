@@ -1,6 +1,7 @@
 import 'package:eslar/pages/auth/register.dart';
 import 'package:flutter/material.dart';
 import 'package:eslar/pages/auth/login.dart';
+import 'package:eslar/pages/projects/startVisit.dart';
 import 'package:eslar/components/button.dart';
 void main() {
   runApp(const MyApp());
@@ -73,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const Login(),
+                        builder: (context) => const StartVisit(id: 2,),
                       ),
                     );
                   },

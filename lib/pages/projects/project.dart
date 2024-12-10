@@ -1,6 +1,9 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:eslar/components/button.dart';
+import 'package:eslar/pages/projects/startVisit.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:eslar/components/AppConfig.dart';
@@ -17,16 +20,16 @@ class Project extends StatefulWidget {
 
 class _ProjectState extends State<Project> {
   List<dynamic> dataProject = [];
-  List<List<int>> FilesCod = [];
-  Future<void> SaveFile(List<String> forDecode) async {
+  List<List<int>> Attachments = [];
+  void ProcessFile(List<String> fileEncoded) {
     try {
-      forDecode.forEach(
+      fileEncoded.forEach(
         (item) {
           List<int> bytes = base64Decode(item);
           setState(() {
-            FilesCod.add(bytes);
-          });
-          print(FilesCod);
+              Attachments.add(bytes);
+            },
+          );
         },
       );
     } catch (e) {
@@ -34,39 +37,37 @@ class _ProjectState extends State<Project> {
     }
   }
 
-  Future<void> ImageOpen(valueImage) async {
+  Future<void> AttachmentFocus(valueFile) async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        bool isPdf(List<int> valueImage) {
-          return valueImage.length >= 4 &&
-              valueImage[0] == 0x25 &&
-              valueImage[1] == 0x50 &&
-              valueImage[2] == 0x44 &&
-              valueImage[3] == 0x46;
+        bool isPdf(List<int> valueToAnalyze) {
+          return valueToAnalyze.length >= 4 &&
+              valueToAnalyze[0] == 0x25 &&
+              valueToAnalyze[1] == 0x50 &&
+              valueToAnalyze[2] == 0x44 &&
+              valueToAnalyze[3] == 0x46;
         }
-
         return Dialog(
           backgroundColor: Colors.transparent,
           child: Stack(
             children: [
-              isPdf(valueImage)
+              isPdf(valueFile)
                   ? Container(
                       width: MediaQuery.of(context).size.width * 0.9,
                       height: MediaQuery.of(context).size.height * 0.9,
-                      child: SfPdfViewer.memory(valueImage),
+                      child: SfPdfViewer.memory(valueFile),
                     )
                   : Container(
                       width: MediaQuery.of(context).size.width * 0.9,
                       height: MediaQuery.of(context).size.height * 0.9,
-                      child: Image.memory(valueImage),
+                      child: Image.memory(valueFile),
                     ),
-              // Botão de Fechar
               Positioned(
-                top: 10, // Ajuste para posicionar o botão
-                right: 10, // Ajuste para posicionar o botão
+                top: 10,
+                right: 10,
                 child: GestureDetector(
-                  onTap: () => Navigator.of(context).pop(), // Fecha o diálogo
+                  onTap: () => Navigator.of(context).pop(),
                   child: Container(
                     padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -100,9 +101,8 @@ class _ProjectState extends State<Project> {
         setState(() {
           dataProject = [data['data']];
         });
-        List<String> uploadedFiles =
-            List<String>.from(jsonDecode(data['data']['UPLOADED_FILES']));
-        SaveFile(uploadedFiles);
+        List<String> uploadedFiles = List<String>.from(jsonDecode(data['data']['UPLOADED_FILES']));
+        ProcessFile(uploadedFiles);
       } else {
         print('Erro: ${response.statusCode}');
       }
@@ -110,7 +110,6 @@ class _ProjectState extends State<Project> {
       print('Erro na requisição: $e');
     }
   }
-
   @override
   void initState() {
     super.initState();
@@ -276,7 +275,7 @@ class _ProjectState extends State<Project> {
                               ],
                             ),
                           ),
-                          FilesCod.isEmpty
+                          Attachments.isEmpty
                               ? Container(
                                   child: Text("Sem imagem"),
                                 )
@@ -288,7 +287,7 @@ class _ProjectState extends State<Project> {
                                     crossAxisAlignment:
                                         WrapCrossAlignment.center,
                                     spacing: 6,
-                                    children: FilesCod.map(
+                                    children: Attachments.map(
                                       (fileBytes) {
                                         Uint8List uint8List =
                                             Uint8List.fromList(fileBytes);
@@ -312,7 +311,7 @@ class _ProjectState extends State<Project> {
                                                     0.16,
                                                 child: GestureDetector(
                                                   onTap: () =>
-                                                      ImageOpen(uint8List),
+                                                      AttachmentFocus(uint8List),
                                                   child: AbsorbPointer(
                                                     child: SfPdfViewer.memory(
                                                       uint8List,
@@ -331,7 +330,7 @@ class _ProjectState extends State<Project> {
                                                     0.2,
                                                 child: GestureDetector(
                                                   onTap: () =>
-                                                      ImageOpen(uint8List),
+                                                      AttachmentFocus(uint8List),
                                                   child:
                                                       Image.memory(uint8List),
                                                 ),
@@ -345,7 +344,10 @@ class _ProjectState extends State<Project> {
                             width: double.infinity,
                             child: Button(
                               text: "Iniciar Visita",
-                              func: () {},
+                              func: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => StartVisit(id: dataProject[0]['ID'],)));
+                              },
+                              
                             ),
                           ),
                           Container(

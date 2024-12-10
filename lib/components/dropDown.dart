@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:eslar/components/AppConfig.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 
 class Dropdown extends StatefulWidget {
-  final String initialValue;
   final List<String> data;
   final String label;
-  final double padding;
   final void Function(String)? onChanged;
 
   const Dropdown({
     super.key,
-    this.initialValue = "",
     required this.data,
     required this.label,
     this.onChanged,
-    this.padding = 7
   });
 
   @override
@@ -25,38 +22,90 @@ class _DropdownState extends State<Dropdown> {
   late String selectedValue;
 
   @override
-  void initState() {
-    super.initState();
-    selectedValue = widget.initialValue; // Inicializa com o valor inicial
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 5),
-      padding: EdgeInsets.symmetric(horizontal: widget.padding),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppConfig().radius),
-          border: Border.all(color: AppConfig().primaryColor, width: 2.5)),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton(
-          value: selectedValue.isNotEmpty ? selectedValue : null,
-          isExpanded: true,
-          hint: Text(widget.label),
-          items: widget.data.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
-          onChanged: (String? newValue) {
-            setState(() {
-              selectedValue = newValue!;
-            });
-            widget.onChanged!(newValue!);
-          },
-        ),
-      ),
-    );
+                    margin: const EdgeInsets.symmetric(vertical: 5),
+                    child: DropdownSearch<String>(
+                      onChanged: (value) {
+                        setState(() {
+                          selectedValue = value!;
+                        });
+                      },
+                      items: (filter, infiniteScrollProps) => widget.data,
+                      suffixProps: DropdownSuffixProps(
+                        dropdownButtonProps: DropdownButtonProps(
+                          iconClosed: Icon(Icons.keyboard_arrow_down),
+                          iconOpened: Icon(Icons.keyboard_arrow_up),
+                        ),
+                      ),
+                      decoratorProps: DropDownDecoratorProps(
+                        textAlign: TextAlign.left,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: AppConfig().primaryColor, width: 2.5),
+                            borderRadius:
+                                BorderRadius.circular(AppConfig().radius),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: AppConfig().primaryColor, width: 2.5),
+                            borderRadius:
+                                BorderRadius.circular(AppConfig().radius),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: AppConfig().primaryColor, width: 2.5),
+                            borderRadius:
+                                BorderRadius.circular(AppConfig().radius),
+                          ),
+                          hintText: widget.label,
+                        ),
+                      ),
+                      popupProps: PopupProps.menu(
+                        showSearchBox: true,
+                        searchFieldProps: TextFieldProps(
+                            decoration: InputDecoration(
+                          hintText: "Pesquisar",
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  width: 2.5, color: AppConfig().primaryColor),
+                              borderRadius:
+                                  BorderRadius.circular(AppConfig().radius),),
+                        ),),
+                        itemBuilder: (context, item, isDisabled, isSelected) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 20),
+                            child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                decoration: BoxDecoration(
+                                  color: AppConfig().primaryColor,
+                                  borderRadius:
+                                      BorderRadius.circular(AppConfig().radius),
+                                ),
+                                child: Text(
+                                  item,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                  textAlign: TextAlign.left,
+                                )),
+                          );
+                        },
+                        constraints: BoxConstraints(),
+                        menuProps: MenuProps(
+                          margin: EdgeInsets.symmetric(
+                              vertical: 12, horizontal: 20),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(
+                                  Radius.circular(AppConfig().radius))),
+                        ),
+                      ),
+                    ),
+                  );
   }
 }

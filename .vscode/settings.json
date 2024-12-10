@@ -1,7 +1,7 @@
 {
     "dart.flutterSdkPath": "C:\\Users\\marca\\dev\\flutter",
     "dart.hotReloadOnSave": "all",
-    "files.autoSave": "afterDelay",
+    "files.autoSave": "off",
     "files.autoSaveDelay": 500,
     "dart.flutterHotReloadOnSave": "all",
 }
