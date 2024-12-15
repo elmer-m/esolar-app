@@ -13,7 +13,35 @@ class Projects extends StatefulWidget {
 }
 
 class _ProjectsState extends State<Projects> {
-  List<dynamic> dataProject = [];
+  List<dynamic> dataProject = [
+    {
+      'ID': 1,
+      'CLIENT_NAME': 'Cliente Exemplo',
+      'GOAL': 'Este é um objetivo inicial fictício',
+      'LOCATION': 'Lisboa, Portugal',
+      'DATE_PROJECT': '2024-12-15',
+      'STATUS': 'Em progresso',
+      'PRICE': 878.0,
+    },
+    {
+      'ID': 2,
+      'CLIENT_NAME': 'Outro Cliente',
+      'GOAL': 'Meta adicional fictícia',
+      'LOCATION': 'Porto, Portugal',
+      'DATE_PROJECT': '2024-12-20',
+      'STATUS': 'Concluído',
+      'PRICE': 1250.0,
+    },
+        {
+      'ID': 3,
+      'CLIENT_NAME': 'Outro Cliente',
+      'GOAL': 'Meta adicional fictícia',
+      'LOCATION': 'Porto, Portugal',
+      'DATE_PROJECT': '2024-12-20',
+      'STATUS': 'Concluído',
+      'PRICE': 1250.0,
+    },
+  ];
   Future<void> GetProjetcts() async {
     final url = Uri.parse("https://tze.ddns.net:8108/requestProjects.php");
     final headers = {"Content-Type": "application/json"};
@@ -48,7 +76,6 @@ class _ProjectsState extends State<Projects> {
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppConfig().radius),
-          color: const Color.fromARGB(57, 139, 139, 139),
         ),
         child: RefreshIndicator(
             onRefresh: GetProjetcts,
@@ -65,8 +92,14 @@ class _ProjectsState extends State<Projects> {
                               GestureDetector(
                                 onTap: () {
                                   var id = dataInfo['ID'].toString();
-                                  Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) => Project(id: id,)));
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Project(
+                                        id: id,
+                                      ),
+                                    ),
+                                  );
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
@@ -75,7 +108,8 @@ class _ProjectsState extends State<Projects> {
                                       const EdgeInsets.symmetric(vertical: 10),
                                   width: double.infinity,
                                   decoration: BoxDecoration(
-                                    color: AppConfig().primaryColor,
+                                    border: Border.all(color: AppConfig().textColorW, width: 0.2),
+                                    color: AppConfig().backgroundColor,
                                     borderRadius: BorderRadius.circular(
                                         AppConfig().radius),
                                   ),
@@ -87,7 +121,7 @@ class _ProjectsState extends State<Projects> {
                                         child: Text(
                                           dataInfo['CLIENT_NAME'].toString(),
                                           style: TextStyle(
-                                              color: Colors.white,
+                                              color: AppConfig().textColorW,
                                               fontSize: 18,
                                               fontWeight: FontWeight.w500),
                                         ),
@@ -99,7 +133,7 @@ class _ProjectsState extends State<Projects> {
                                           child: Text(
                                             dataInfo['GOAL'].toString(),
                                             style: TextStyle(
-                                              color: Colors.white,
+                                              color: AppConfig().textColorW,
                                               fontSize: 15,
                                             ),
                                           ),
@@ -112,7 +146,7 @@ class _ProjectsState extends State<Projects> {
                                           child: Text(
                                             "Instalação do produto",
                                             style: TextStyle(
-                                              color: Colors.white,
+                                              color: AppConfig().textColorW,
                                               fontSize: 12,
                                             ),
                                           ),
@@ -129,14 +163,14 @@ class _ProjectsState extends State<Projects> {
                                                     EdgeInsets.only(right: 5),
                                                 child: Icon(
                                                   Icons.location_on,
-                                                  color: Colors.white,
+                                                  color: AppConfig().textColorW,
                                                   size: 15,
                                                 ),
                                               ),
                                               Text(
                                                 dataInfo['LOCATION'].toString(),
                                                 style: TextStyle(
-                                                    color: Colors.white),
+                                                    color: AppConfig().textColorW,),
                                               )
                                             ],
                                           ),
@@ -153,7 +187,7 @@ class _ProjectsState extends State<Projects> {
                                                     EdgeInsets.only(right: 5),
                                                 child: Icon(
                                                   Icons.calendar_month_rounded,
-                                                  color: Colors.white,
+                                                  color: AppConfig().textColorW,
                                                   size: 15,
                                                 ),
                                               ),
@@ -161,7 +195,7 @@ class _ProjectsState extends State<Projects> {
                                                 dataInfo['DATE_PROJECT']
                                                     .toString(),
                                                 style: TextStyle(
-                                                    color: Colors.white),
+                                                    color: AppConfig().textColorW,),
                                               )
                                             ],
                                           ),
@@ -178,14 +212,14 @@ class _ProjectsState extends State<Projects> {
                                                     EdgeInsets.only(right: 5),
                                                 child: Icon(
                                                   Icons.check,
-                                                  color: Colors.white,
+                                                  color: AppConfig().textColorW,
                                                   size: 15,
                                                 ),
                                               ),
                                               Text(
                                                 dataInfo['STATUS'].toString(),
                                                 style: TextStyle(
-                                                    color: Colors.white),
+                                                    color: AppConfig().textColorW,),
                                               )
                                             ],
                                           ),
@@ -195,14 +229,28 @@ class _ProjectsState extends State<Projects> {
                                         margin: EdgeInsets.only(top: 15),
                                         child: Row(
                                           children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  margin: EdgeInsets.only(right: 5),
+                                                  child: Icon(Icons.person),
+                                                ),
+                                                Text(
+                                              "Alexandre afonso",
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  color: AppConfig().textColorW,),
+                                            ),
+                                              ],
+                                            ),
                                             Spacer(),
                                             Text(
                                               "878€",
                                               style: TextStyle(
                                                   fontSize: 24,
                                                   fontWeight: FontWeight.bold,
-                                                  color: Colors.white),
-                                            )
+                                                  color: AppConfig().textColorW,),
+                                            ),
                                           ],
                                         ),
                                       )

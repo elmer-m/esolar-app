@@ -1,6 +1,5 @@
 // ignore_for_file: non_constant_identifier_names
 
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:eslar/components/button.dart';
 import 'package:eslar/pages/projects/startVisit.dart';
@@ -19,14 +18,34 @@ class Project extends StatefulWidget {
 }
 
 class _ProjectState extends State<Project> {
-  List<dynamic> dataProject = [];
+  List<dynamic> dataProject = [
+    {
+      'CLIENT_NAME': 'João Silva',
+      'GOAL': 'Instalação de paineis fotovoltaicos.',
+      'STATUS': 'Em andamento',
+      'LOCATION': 'Lisboa',
+      'ADDRESS': 'Rua das Flores, 123',
+      'DATE_PROJECT': '2024-12-15',
+      'PHONE_CODE': '351',
+      'PHONE': '912345678',
+      'UPLOADED_FILES': jsonEncode([
+        base64Encode(
+            Uint8List.fromList([0x25, 0x50, 0x44, 0x46])), // Exemplo de PDF
+        base64Encode(Uint8List.fromList(
+            [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A])), // Exemplo de PNG
+      ]),
+      'ID': '1'
+    }
+  ];
+
   List<List<int>> Attachments = [];
   void ProcessFile(List<String> fileEncoded) {
     try {
       fileEncoded.forEach(
         (item) {
           List<int> bytes = base64Decode(item);
-          setState(() {
+          setState(
+            () {
               Attachments.add(bytes);
             },
           );
@@ -48,6 +67,7 @@ class _ProjectState extends State<Project> {
               valueToAnalyze[2] == 0x44 &&
               valueToAnalyze[3] == 0x46;
         }
+
         return Dialog(
           backgroundColor: Colors.transparent,
           child: Stack(
@@ -101,7 +121,8 @@ class _ProjectState extends State<Project> {
         setState(() {
           dataProject = [data['data']];
         });
-        List<String> uploadedFiles = List<String>.from(jsonDecode(data['data']['UPLOADED_FILES']));
+        List<String> uploadedFiles =
+            List<String>.from(jsonDecode(data['data']['UPLOADED_FILES']));
         ProcessFile(uploadedFiles);
       } else {
         print('Erro: ${response.statusCode}');
@@ -110,6 +131,7 @@ class _ProjectState extends State<Project> {
       print('Erro na requisição: $e');
     }
   }
+
   @override
   void initState() {
     super.initState();
@@ -119,26 +141,40 @@ class _ProjectState extends State<Project> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppConfig().overlayColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
-        iconTheme: IconThemeData(
-          color: AppConfig().primaryColor,
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppConfig().backgroundColor,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: IconButton(
+            icon: Icon(Icons.arrow_back, color: AppConfig().primaryColor),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
         ),
       ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            width: double.infinity * 0.80,
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(57, 139, 139, 139),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Center(
-              child: dataProject.isEmpty
-                  ? const CircularProgressIndicator()
-                  : SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          width: double.infinity * 0.80,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Center(
+            child: dataProject.isEmpty
+                ? const CircularProgressIndicator()
+                : SingleChildScrollView(
+                    child: Container(
+                      padding: EdgeInsets.all(AppConfig().padidng),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(AppConfig().radius),
+                        color: AppConfig().backgroundColor,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -148,9 +184,12 @@ class _ProjectState extends State<Project> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.circular(AppConfig().radius),
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: AppConfig().textColorW,
+                                  width: 0.2,
+                                ),
+                              ),
                             ),
                             child: Text(
                               dataProject[0]['CLIENT_NAME'].toString(),
@@ -164,9 +203,12 @@ class _ProjectState extends State<Project> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.circular(AppConfig().radius),
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: AppConfig().textColorW,
+                                  width: 0.2,
+                                ),
+                              ),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,9 +239,12 @@ class _ProjectState extends State<Project> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.circular(AppConfig().radius),
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: AppConfig().textColorW,
+                                  width: 0.2,
+                                ),
+                              ),
                             ),
                             child: Column(
                               children: [
@@ -220,7 +265,7 @@ class _ProjectState extends State<Project> {
                                         child: Text(
                                           "${dataProject[0]['LOCATION'].toString()}, ${dataProject[0]['ADDRESS'].toString()}",
                                           style: const TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 14,
                                               fontWeight: FontWeight.w400),
                                         ),
                                       )
@@ -244,7 +289,7 @@ class _ProjectState extends State<Project> {
                                         dataProject[0]['DATE_PROJECT']
                                             .toString(),
                                         style: const TextStyle(
-                                            fontSize: 12,
+                                            fontSize: 14,
                                             fontWeight: FontWeight.w400),
                                       ),
                                     ],
@@ -266,7 +311,7 @@ class _ProjectState extends State<Project> {
                                       Text(
                                         "+${dataProject[0]['PHONE_CODE']} ${dataProject[0]['PHONE']}",
                                         style: const TextStyle(
-                                            fontSize: 12,
+                                            fontSize: 14,
                                             fontWeight: FontWeight.w400),
                                       ),
                                     ],
@@ -310,8 +355,8 @@ class _ProjectState extends State<Project> {
                                                         .height *
                                                     0.16,
                                                 child: GestureDetector(
-                                                  onTap: () =>
-                                                      AttachmentFocus(uint8List),
+                                                  onTap: () => AttachmentFocus(
+                                                      uint8List),
                                                   child: AbsorbPointer(
                                                     child: SfPdfViewer.memory(
                                                       uint8List,
@@ -329,8 +374,8 @@ class _ProjectState extends State<Project> {
                                                         .height *
                                                     0.2,
                                                 child: GestureDetector(
-                                                  onTap: () =>
-                                                      AttachmentFocus(uint8List),
+                                                  onTap: () => AttachmentFocus(
+                                                      uint8List),
                                                   child:
                                                       Image.memory(uint8List),
                                                 ),
@@ -345,9 +390,13 @@ class _ProjectState extends State<Project> {
                             child: Button(
                               text: "Iniciar Visita",
                               func: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => StartVisit(id: dataProject[0]['ID'],)));
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => StartVisit(
+                                              id: 2,
+                                            )));
                               },
-                              
                             ),
                           ),
                           Container(
@@ -363,7 +412,9 @@ class _ProjectState extends State<Project> {
                         ],
                       ),
                     ),
-            )),
+                  ),
+          ),
+        ),
       ),
     );
   }

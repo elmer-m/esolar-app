@@ -2,7 +2,7 @@ import 'package:eslar/pages/more/more.dart';
 import 'package:eslar/pages/projects/addProject.dart';
 import 'package:eslar/pages/home.dart';
 import 'package:eslar/pages/auth/login.dart';
-import 'package:eslar/pages/projects/projetcs.dart';
+import 'package:eslar/pages/projects/projects.dart';
 import 'package:eslar/pages/auth/register.dart';
 import 'package:flutter/material.dart';
 import 'package:eslar/components/AppConfig.dart';
@@ -32,6 +32,7 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppConfig().overlayColor,
       floatingActionButton:
           selectedIndex == 1 ? FloatingActionButton(
             onPressed: () {

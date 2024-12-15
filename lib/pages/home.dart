@@ -15,7 +15,6 @@ class _HomeState extends State<Home> {
       child: Container(
         padding: EdgeInsets.all(AppConfig().radius),
         decoration: BoxDecoration(
-            color: AppConfig().backgroundColor,
             borderRadius: BorderRadius.circular(AppConfig().radius)),
         child: SingleChildScrollView(
           child: Column(
@@ -26,27 +25,28 @@ class _HomeState extends State<Home> {
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: AppConfig().primaryColor,
+                  color: AppConfig().backgroundColor,
+                  border: Border.all(width: 0.2, color: AppConfig().textColorW),
                   borderRadius: BorderRadius.circular(AppConfig().radius),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      child: const Text(
+                      child:  Text(
                         "Propostas Pendentes",
                         style: TextStyle(
-                            color: Colors.white,
+                            color: AppConfig().textColorW,
                             fontSize: 18,
                             fontWeight: FontWeight.w500),
                       ),
                     ),
                     Container(
                       margin: const EdgeInsets.only(top: 15),
-                      child: const Text(
+                      child: Text(
                         "12",
                         style: TextStyle(
-                            color: Colors.white,
+                            color: AppConfig().textColorW,
                             fontSize: 25,
                             fontWeight: FontWeight.bold),
                       ),
@@ -60,27 +60,28 @@ class _HomeState extends State<Home> {
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: AppConfig().primaryColor,
+                  color: AppConfig().backgroundColor,
+                  border: Border.all(width: 0.2, color: AppConfig().textColorW),
                   borderRadius: BorderRadius.circular(AppConfig().radius),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      child: const Text(
+                      child: Text(
                         "Propostas Concluidas",
                         style: TextStyle(
-                            color: Colors.white,
+                            color: AppConfig().textColorW,
                             fontSize: 18,
                             fontWeight: FontWeight.w500),
                       ),
                     ),
                     Container(
                       margin: const EdgeInsets.only(top: 15),
-                      child: const Text(
+                      child: Text(
                         "5",
                         style: TextStyle(
-                            color: Colors.white,
+                            color: AppConfig().textColorW,
                             fontSize: 25,
                             fontWeight: FontWeight.bold),
                       ),
@@ -94,27 +95,28 @@ class _HomeState extends State<Home> {
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: AppConfig().primaryColor,
+                  color: AppConfig().backgroundColor,
                   borderRadius: BorderRadius.circular(AppConfig().radius),
+                  border: Border.all(width: 0.2, color: AppConfig().textColorW),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      child: const Text(
+                      child: Text(
                         "A espera do orçamento",
                         style: TextStyle(
-                            color: Colors.white,
+                            color: AppConfig().textColorW,
                             fontSize: 18,
                             fontWeight: FontWeight.w500),
                       ),
                     ),
                     Container(
                       margin: const EdgeInsets.only(top: 15),
-                      child: const Text(
+                      child:  Text(
                         "2",
                         style: TextStyle(
-                            color: Colors.white,
+                            color: AppConfig().textColorW,
                             fontSize: 25,
                             fontWeight: FontWeight.bold),
                       ),
@@ -128,27 +130,28 @@ class _HomeState extends State<Home> {
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: AppConfig().primaryColor,
+                  color: AppConfig().backgroundColor,
                   borderRadius: BorderRadius.circular(AppConfig().radius),
+                  border: Border.all(width: 0.2, color: AppConfig().textColorW),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      child: const Text(
+                      child: Text(
                         "Visitas Marcadas Para Hoje",
                         style: TextStyle(
-                            color: Colors.white,
+                            color: AppConfig().textColorW,
                             fontSize: 18,
                             fontWeight: FontWeight.w500),
                       ),
                     ),
                     Container(
                       margin: const EdgeInsets.only(top: 15),
-                      child: const Text(
+                      child: Text(
                         "3",
                         style: TextStyle(
-                            color: Colors.white,
+                            color: AppConfig().textColorW,
                             fontSize: 25,
                             fontWeight: FontWeight.bold),
                       ),

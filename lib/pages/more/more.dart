@@ -23,15 +23,14 @@ class _MoreState extends State<More> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppConfig().radius),
-          color: const Color.fromARGB(58, 139, 139, 139),
         ),
         child: Column(
           children: [
-            const ToPage(page: Config(), pageLabel: "Definições"),
+            ToPage(page: Config(), pageLabel: "Definições"),
             ToPage(page: Account(), pageLabel: "Conta"),
-            const ToPage(page: ProjectsFinished(), pageLabel: "Projetos"),
-            const ToPage(page: About(), pageLabel: "Sobre"),
-            const Spacer(),
+            ToPage(page: ProjectsFinished(), pageLabel: "Projetos"),
+            ToPage(page: About(), pageLabel: "Sobre"),
+            Spacer(),
             SizedBox(
               width: double.infinity,
               child: Button(

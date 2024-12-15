@@ -18,15 +18,36 @@ class _LoginState extends State<Login> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool invalidData = false;
+  String errorText = "";
   Future<void> Entrar() async {
+    // Navigator.pushAndRemoveUntil(
+    //         context,
+    //         MaterialPageRoute(
+    //           builder: (context) => const Dashboard(),
+    //         ),
+    //         (Route<dynamic> route) => false,
+    //       );
     final url = Uri.parse('https://tze.ddns.net:8108/login.php');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       'email': emailController.text,
       'password': passwordController.text,
     });
-
-    try {
+    if(passwordController.text.length < 8 ){
+      setState(() {
+        Loading = false;
+        invalidData = true;
+        errorText = "A password deve ser ter mais de 8 caracteres.";
+      });
+    } else if(emailController.text.length < 8 ){
+      setState(() {
+        Loading = false;
+        invalidData = true;
+        errorText = "A password deve ser ter mais de 8 caracteres.";
+      });
+    }
+    else {
+      try {
       final response = await http.post(url, headers: headers, body: body);
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
@@ -50,6 +71,7 @@ class _LoginState extends State<Login> {
       }
     } catch (e) {
       print("Erro: $e");
+    }
     }
   }
 
@@ -103,9 +125,8 @@ class _LoginState extends State<Login> {
                             margin: const EdgeInsets.only(
                               bottom: 10,
                             ),
-                            child: const Center(
-                              child: Text(
-                                "Credenciais Inválidas.",
+                            child: Center(
+                              child: Text(errorText,
                                 style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     color: Colors.red),
