@@ -23,16 +23,16 @@ class Input extends StatelessWidget {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppConfig().radius),
           borderSide: const BorderSide(
-            color: Colors.blue, width: 5.0),
+            color: Colors.blue, width: 1.5),
           ),
           contentPadding: const EdgeInsets.symmetric(vertical: 1, horizontal: 15),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppConfig().radius),
-            borderSide: BorderSide(color: AppConfig().primaryColor, width: 2.5),
+            borderSide: BorderSide(color: AppConfig().textColorW, width: 1.5),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppConfig().radius),
-            borderSide:  BorderSide(color: AppConfig().primaryColor, width: 2.5),
+            borderSide:  BorderSide(color: AppConfig().primaryColor, width: 1.5),
           ),
       ),
       style: const TextStyle(color: Colors.black),

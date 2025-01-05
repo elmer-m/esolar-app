@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:eslar/components/sendAttachment.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:eslar/components/button.dart';
@@ -19,69 +20,18 @@ class StartVisit extends StatefulWidget {
 }
 
 class _StartVisitState extends State<StartVisit> {
-  TextEditingController client_name = TextEditingController();
-  TextEditingController client_number = TextEditingController();
-  TextEditingController client_number_code = TextEditingController();
-  TextEditingController date = TextEditingController();
-  TextEditingController location = TextEditingController();
-  TextEditingController address = TextEditingController();
-
-  String phone_code = "";
-  String goal = "";
-  String status = "";
-
-  List<String> files = [];
-  List<String> optionsGoal = [];
-  List<String> optionsStatus = [];
-
+  bool uploading = false;
+  TextEditingController visita = new TextEditingController();
   DateTime? selectedDate;
-
-  Future<void> selectData(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(primary: AppConfig().primaryColor),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (pickedDate != null && pickedDate != selectedDate) {
-      final TimeOfDay? pickedTime = await showTimePicker(
-          context: context,
-          initialTime: const TimeOfDay(hour: 16, minute: 00),
-          builder: (context, child) {
-            return Theme(
-              data: Theme.of(context).copyWith(
-                colorScheme:
-                    ColorScheme.light(primary: AppConfig().primaryColor),
-              ),
-              child: child!,
-            );
-          });
-      if (pickedTime != null) {
-        final DateTime finalDateAndHour = DateTime(
-          pickedDate.year,
-          pickedDate.month,
-          pickedDate.day,
-          pickedTime.hour,
-          pickedTime.minute,
-        );
-        setState(
-          () {
-            selectedDate = finalDateAndHour;
-            date.value = TextEditingValue(
-              text: DateFormat('yyyy-MM-dd HH:mm').format(selectedDate!),
-            );
-          },
-        );
-      }
-    }
-  }
+  List<String> files = [];
+  List<String> invoice = [];
+  List<String> instalation_tipology_types = [];
+  List<String> client_tipology_types = [];
+  List<String> external_house = [];
+  List<String> eletrical_panel = [];
+  List<String> eletrical_counter = [];
+  String instalation_tipology = "teste";
+  String client_tipology = "teste";
 
   Future<void> pickFile() async {
     FilePickerResult? result =
@@ -111,85 +61,37 @@ class _StartVisitState extends State<StartVisit> {
     }
   }
 
-  bool uploading = false;
-  List<String> locations = ['teste'];
-  Future<void> getLocations() async {
-    final url = Uri.parse('https://tze.ddns.net:8108/getLocations.php');
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      try {
-        var data = jsonDecode(response.body);
-        setState(() {
-          locations = List<String>.from(
-              data['data'].map((item) => item['DESCRICAO'] as String));
-        });
-      } catch (e) {
-        print("Erro ao decodificar JSON: $e");
-      }
-    } else {
-      print("Erro ao fazer a requisição. Status: ${response.statusCode}");
-    }
-  }
-
-  Future<void> getGoals() async {
-    final url = Uri.parse('https://tze.ddns.net:8108/getGoals.php');
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      try {
-        var data = jsonDecode(response.body);
-        print("Data ${response.body}");
-        setState(() {
-          optionsGoal = List<String>.from(
-              data['data'].map((item) => item['OBJETIVO'] as String));
-        });
-      } catch (e) {
-        print("Erro ao decodificar JSON: $e");
-      }
-    } else {
-      print("Erro ao fazer a requisição. Status: ${response.statusCode}");
-    }
-  }
-
-  Future<void> getStatus() async {
-    final url = Uri.parse('https://tze.ddns.net:8108/getStatus.php');
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      try {
-        var data = jsonDecode(response.body);
-        print("Data ${response.body}");
-        setState(() {
-          optionsStatus = List<String>.from(
-              data['data'].map((item) => item['ESTADO'] as String));
-        });
-      } catch (e) {
-        print("Erro ao decodificar JSON: $e");
-      }
-    } else {
-      print("Erro ao fazer a requisição. Status: ${response.statusCode}");
-    }
-  }
-
   Future<void> Create() async {
-    final url = Uri.parse('https://tze.ddns.net:8108/newProject.php');
+    final url = Uri.parse('https://tze.ddns.net:8108/visitCreation.php');
 
     try {
       setState(() {
         uploading = true;
       });
       var request = http.MultipartRequest('POST', url);
-      request.fields['client_name'] = client_name.text;
-      request.fields['phone_code'] = client_number_code.text;
-      request.fields['phone'] = client_number.text;
-      request.fields['location'] = location.text;
-      request.fields['address'] = address.text;
-      request.fields['goal'] = goal;
-      request.fields['status'] = status;
-      request.fields['date'] = date.text;
-
-      for (String path in files) {
-        File file = File(path);
+      request.fields['instalation_tipology'] = instalation_tipology;
+      request.fields['client_tipology'] = client_tipology;
+      request.fields['project_id'] = widget.id.toString();
+      request.fields['name'] = visita.text;
+      for (String external_house_files in external_house) {
+        File file = File(external_house_files);
+        request.files.add(
+            await http.MultipartFile.fromPath('external_house[]', file.path));
+      }
+      for (String invoices_files in invoice) {
+        File file = File(invoices_files);
         request.files
-            .add(await http.MultipartFile.fromPath('files[]', file.path));
+            .add(await http.MultipartFile.fromPath('invoices[]', file.path));
+      }
+      for (String eletrical_counter_files in eletrical_counter) {
+        File file = File(eletrical_counter_files);
+        request.files.add(
+            await http.MultipartFile.fromPath('eletric_counter[]', file.path));
+      }
+      for (String panel_counter_files in eletrical_panel) {
+        File file = File(panel_counter_files);
+        request.files.add(
+            await http.MultipartFile.fromPath('eletric_panel[]', file.path));
       }
       var streamResponse = await request.send();
 
@@ -213,9 +115,6 @@ class _StartVisitState extends State<StartVisit> {
 
   @override
   void initState() {
-    getLocations();
-    getGoals();
-    getStatus();
     super.initState();
   }
 
@@ -224,16 +123,17 @@ class _StartVisitState extends State<StartVisit> {
     return Scaffold(
       appBar: AppBar(
         shadowColor: Colors.transparent,
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppConfig().overlayColor,
         iconTheme: IconThemeData(color: AppConfig().primaryColor),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      body: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        color: AppConfig().overlayColor,
         child: Container(
           width: double.infinity,
           height: double.infinity,
           decoration: BoxDecoration(
-            color: const Color.fromARGB(58, 139, 139, 139),
+            color: AppConfig().backgroundColor,
             borderRadius: BorderRadius.circular(AppConfig().radius),
           ),
           child: SingleChildScrollView(
@@ -244,7 +144,7 @@ class _StartVisitState extends State<StartVisit> {
                 children: [
                   Container(
                     margin: const EdgeInsets.only(top: 10, bottom: 20),
-                    child: const Center(
+                    child: Center(
                       child: Text(
                         "Visita",
                         style: TextStyle(
@@ -252,179 +152,51 @@ class _StartVisitState extends State<StartVisit> {
                       ),
                     ),
                   ),
-                  Text("Id = ${widget.id}"),
-                  Dropdown(data: locations, label: "Tipologia de instalação"),
-                  Dropdown(data: locations, label: "Tipologia de cliente"),
                   Container(
-                    child: files.isNotEmpty
-                        ? Wrap(
-                            spacing: 5,
-                            children: files
-                                .map((file) => file.endsWith('.png')
-                                    ? Container(
-                                        child: Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.2,
-                                          child: Image.file(
-                                            File(file),
-                                          ),
-                                        ),
-                                      )
-                                    : Container(
-                                        child: const Text(
-                                            "outro tipo de ficheiro")))
-                                .toList(),
-                          )
-                        : GestureDetector(
-                            onTap: pickFile,
-                            child: Container(
-                              margin: const EdgeInsets.only(top: 10),
-                              height: 40,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(40),
-                                  color: AppConfig().primaryColor),
-                              child: const Icon(
-                                Icons.add,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
+                    child: Input(label: "Nome", controler: visita),
+                    margin: EdgeInsets.symmetric(vertical: 5),
                   ),
-                  // Container(
-                  //   width: double.infinity,
-                  //   margin: EdgeInsets.symmetric(vertical: 10),
-                  //   child: Column(
-                  //     children: [
-                  //       Container(
-                  //         margin: EdgeInsets.symmetric(vertical: 10),
-                  //         child: Text(
-                  //           "Funcionários",
-                  //           style: TextStyle(
-                  //               fontSize: 18, fontWeight: FontWeight.w500),
-                  //         ),
-                  //       ),
-                  //       Wrap(
-                  //         spacing: 3,
-                  //         runSpacing: 3,
-                  //         alignment: WrapAlignment.center,
-                  //         children: [
-                  //           Container(
-                  //             padding: EdgeInsets.symmetric(
-                  //                 horizontal: 8, vertical: 5),
-                  //             decoration: BoxDecoration(
-                  //               borderRadius:
-                  //                   BorderRadius.circular(AppConfig().radius),
-                  //               color: AppConfig().primaryColor,
-                  //             ),
-                  //             child: Text(
-                  //               "João Costa",
-                  //               style: TextStyle(
-                  //                 fontWeight: FontWeight.w500,
-                  //                 color: Colors.white,
-                  //               ),
-                  //             ),
-                  //           ),
-                  //           Container(
-                  //             padding: EdgeInsets.symmetric(
-                  //                 horizontal: 8, vertical: 5),
-                  //             decoration: BoxDecoration(
-                  //               borderRadius:
-                  //                   BorderRadius.circular(AppConfig().radius),
-                  //               color: AppConfig().primaryColor,
-                  //             ),
-                  //             child: Text(
-                  //               "Maria Silva",
-                  //               style: TextStyle(
-                  //                 fontWeight: FontWeight.w500,
-                  //                 color: Colors.white,
-                  //               ),
-                  //             ),
-                  //           ),
-                  //           Container(
-                  //             padding: EdgeInsets.symmetric(
-                  //                 horizontal: 8, vertical: 5),
-                  //             decoration: BoxDecoration(
-                  //               borderRadius:
-                  //                   BorderRadius.circular(AppConfig().radius),
-                  //               color: AppConfig().primaryColor,
-                  //             ),
-                  //             child: Text(
-                  //               "Carlos Santos",
-                  //               style: TextStyle(
-                  //                 fontWeight: FontWeight.w500,
-                  //                 color: Colors.white,
-                  //               ),
-                  //             ),
-                  //           ),
-                  //           Container(
-                  //             padding: EdgeInsets.symmetric(
-                  //                 horizontal: 8, vertical: 5),
-                  //             decoration: BoxDecoration(
-                  //               borderRadius:
-                  //                   BorderRadius.circular(AppConfig().radius),
-                  //               color: AppConfig().primaryColor,
-                  //             ),
-                  //             child: Text(
-                  //               "Ana Oliveira",
-                  //               style: TextStyle(
-                  //                 fontWeight: FontWeight.w500,
-                  //                 color: Colors.white,
-                  //               ),
-                  //             ),
-                  //           ),
-                  //           Container(
-                  //             padding: EdgeInsets.symmetric(
-                  //                 horizontal: 8, vertical: 5),
-                  //             decoration: BoxDecoration(
-                  //               borderRadius:
-                  //                   BorderRadius.circular(AppConfig().radius),
-                  //               color: AppConfig().primaryColor,
-                  //             ),
-                  //             child: Text(
-                  //               "Pedro Lima",
-                  //               style: TextStyle(
-                  //                 fontWeight: FontWeight.w500,
-                  //                 color: Colors.white,
-                  //               ),
-                  //             ),
-                  //           ),
-                  //           Container(
-                  //             padding: EdgeInsets.symmetric(
-                  //                 horizontal: 8, vertical: 5),
-                  //             decoration: BoxDecoration(
-                  //               borderRadius:
-                  //                   BorderRadius.circular(AppConfig().radius),
-                  //               color: AppConfig().primaryColor,
-                  //             ),
-                  //             child: Text(
-                  //               "Rafael Ferreira",
-                  //               style: TextStyle(
-                  //                 fontWeight: FontWeight.w500,
-                  //                 color: Colors.white,
-                  //               ),
-                  //             ),
-                  //           ),
-                  //           Container(
-                  //             padding: EdgeInsets.symmetric(
-                  //                 horizontal: 5, vertical: 5),
-                  //             decoration: BoxDecoration(
-                  //               borderRadius:
-                  //                   BorderRadius.circular(AppConfig().radius),
-                  //               color: AppConfig().primaryColor,
-                  //             ),
-                  //             child: Icon(
-                  //               Icons.add,
-                  //               color: Colors.white,
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
+                  Dropdown(
+                    data: instalation_tipology_types,
+                    label: "Tipologia de instalação",
+                    onChanged: (value) {
+                      instalation_tipology = value;
+                    },
+                  ),
+                  Dropdown(
+                      onChanged: (value) {
+                        client_tipology = value;
+                      },
+                      data: client_tipology_types,
+                      label: "Tipologia de cliente"),
+                  Attachment(
+                    isImageOnly: false,
+                    label: "Faturas (PDF)",
+                    onChanged: (value) {
+                      invoice = value;
+                    },
+                  ),
+                  Attachment(
+                    isImageOnly: true,
+                    label: "Contador Elétrico",
+                    onChanged: (value) {
+                      eletrical_counter = value;
+                    },
+                  ),
+                  Attachment(
+                    isImageOnly: true,
+                    label: "Quadro Elétrico",
+                    onChanged: (value) {
+                      eletrical_panel = value;
+                    },
+                  ),
+                  Attachment(
+                    isImageOnly: true,
+                    label: "Exterior Casa",
+                    onChanged: (value) {
+                      external_house = value;
+                    },
+                  ),
                   Container(
                     margin: const EdgeInsets.only(top: 20),
                     width: double.infinity,

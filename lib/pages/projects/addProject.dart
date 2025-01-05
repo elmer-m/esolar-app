@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:eslar/components/dropDown.dart';
+import 'package:eslar/components/sendAttachment.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:eslar/components/button.dart';
@@ -36,7 +38,7 @@ class _AddProjectState extends State<AddProject> {
 
   DateTime? selectedDate;
 
-    Future<void> AttachmentFocus(valueFile) async {
+  Future<void> AttachmentFocus(valueFile) async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -129,7 +131,7 @@ class _AddProjectState extends State<AddProject> {
 
   Future<void> pickFile() async {
     FilePickerResult? result =
-        await FilePicker.platform.pickFiles(allowMultiple: true, allowedExtensions: ['pdf', 'jpeg', 'jpg', 'png']);
+        await FilePicker.platform.pickFiles(allowMultiple: true);
     if (result != null) {
       setState(() {
         files = result.files.map((file) => file.path!).toList();
@@ -272,565 +274,241 @@ class _AddProjectState extends State<AddProject> {
         backgroundColor: Colors.transparent,
         iconTheme: IconThemeData(color: AppConfig().primaryColor),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      body: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Container(
           width: double.infinity,
           height: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppConfig().radius),
           ),
-          child: Column(
-            children: [
-              Container(
-                margin: const EdgeInsets.only(top: 10, bottom: 20),
-                child: const Center(
-                  child: Text(
-                    "Adcionar Projeto",
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 20),
-                decoration: BoxDecoration(
-                    color: AppConfig().backgroundColor,
-                    borderRadius: BorderRadius.circular(AppConfig().radius)),
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 5),
-                          child: Input(
-                            label: "Nome do cliente",
-                            controler: client_name,
-                          ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 5),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                flex: 3,
-                                child: Container(
-                                  child: Input(
-                                    label: "+351",
-                                    controler: client_number_code,
-                                    type: TextInputType.numberWithOptions(),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              Expanded(
-                                flex: 7,
-                                child: Input(
-                                  label: "Número do cliente",
-                                  controler: client_number,
-                                  type: TextInputType.phone,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 5),
-                          child: Input(
-                              label: "Endereço completo", controler: address),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 5),
-                          child: DropdownSearch<String>(
-                            onChanged: (value) {
-                              setState(() {
-                                location.text = value!;
-                              });
-                            },
-                            items: (filter, infiniteScrollProps) => locations,
-                            suffixProps: DropdownSuffixProps(
-                              dropdownButtonProps: DropdownButtonProps(
-                                iconClosed: Icon(Icons.keyboard_arrow_down),
-                                iconOpened: Icon(Icons.keyboard_arrow_up),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  decoration: BoxDecoration(
+                      color: AppConfig().backgroundColor,
+                      borderRadius: BorderRadius.circular(AppConfig().radius)),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(top: 10, bottom: 20),
+                            child: Center(
+                              child: Text(
+                                "Adicionar Projeto",
+                                style: TextStyle(
+                                    fontSize: 25, fontWeight: FontWeight.w600),
                               ),
                             ),
-                            decoratorProps: DropDownDecoratorProps(
-                              textAlign: TextAlign.left,
-                              decoration: InputDecoration(
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 20),
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: AppConfig().primaryColor,
-                                      width: 2.5),
-                                  borderRadius:
-                                      BorderRadius.circular(AppConfig().radius),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: AppConfig().primaryColor,
-                                      width: 2.5),
-                                  borderRadius:
-                                      BorderRadius.circular(AppConfig().radius),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: AppConfig().primaryColor,
-                                      width: 2.5),
-                                  borderRadius:
-                                      BorderRadius.circular(AppConfig().radius),
-                                ),
-                                hintText: 'Local',
-                              ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 5),
+                            child: Input(
+                              label: "Nome do cliente",
+                              controler: client_name,
                             ),
-                            popupProps: PopupProps.menu(
-                              showSearchBox: true,
-                              searchFieldProps: TextFieldProps(
-                                  padding: EdgeInsets.all(AppConfig().radius),
-                                  decoration: InputDecoration(
-                                    hintText: "Pesquisar",
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                            width: 2.5,
-                                            color: AppConfig().primaryColor),
-                                        borderRadius: BorderRadius.circular(
-                                            AppConfig().radius)),
-                                  )),
-                              itemBuilder:
-                                  (context, item, isDisabled, isSelected) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 20),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 5),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 3,
                                   child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 20),
-                                      decoration: BoxDecoration(
-                                        color: AppConfig().primaryColor,
-                                        borderRadius: BorderRadius.circular(
-                                            AppConfig().radius),
-                                      ),
-                                      child: Text(
-                                        item,
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18),
-                                        textAlign: TextAlign.left,
-                                      )),
-                                );
-                              },
-                              constraints: BoxConstraints(),
-                              menuProps: MenuProps(
-                                margin: EdgeInsets.symmetric(
-                                    vertical: 12, horizontal: 20),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(AppConfig().radius))),
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 5),
-                          child: DropdownSearch<String>(
-                            onChanged: (value) {
-                              setState(() {
-                                goal = value!;
-                              });
-                            },
-                            items: (filter, infiniteScrollProps) => optionsGoal,
-                            suffixProps: DropdownSuffixProps(
-                              dropdownButtonProps: DropdownButtonProps(
-                                iconClosed: Icon(Icons.keyboard_arrow_down),
-                                iconOpened: Icon(Icons.keyboard_arrow_up),
-                              ),
-                            ),
-                            decoratorProps: DropDownDecoratorProps(
-                              textAlign: TextAlign.left,
-                              decoration: InputDecoration(
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 20),
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: AppConfig().primaryColor,
-                                      width: 2.5),
-                                  borderRadius:
-                                      BorderRadius.circular(AppConfig().radius),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: AppConfig().primaryColor,
-                                      width: 2.5),
-                                  borderRadius:
-                                      BorderRadius.circular(AppConfig().radius),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: AppConfig().primaryColor,
-                                      width: 2.5),
-                                  borderRadius:
-                                      BorderRadius.circular(AppConfig().radius),
-                                ),
-                                hintText: 'Objetivo',
-                              ),
-                            ),
-                            popupProps: PopupProps.menu(
-                              showSearchBox: true,
-                              searchFieldProps: TextFieldProps(
-                                  decoration: InputDecoration(
-                                hintText: "Pesquisar",
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        width: 2.5,
-                                        color: AppConfig().primaryColor),
-                                    borderRadius: BorderRadius.circular(
-                                        AppConfig().radius)),
-                              )),
-                              itemBuilder:
-                                  (context, item, isDisabled, isSelected) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 20),
-                                  child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 20),
-                                      decoration: BoxDecoration(
-                                        color: AppConfig().primaryColor,
-                                        borderRadius: BorderRadius.circular(
-                                            AppConfig().radius),
-                                      ),
-                                      child: Text(
-                                        item,
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18),
-                                        textAlign: TextAlign.left,
-                                      )),
-                                );
-                              },
-                              constraints: BoxConstraints(),
-                              menuProps: MenuProps(
-                                margin: EdgeInsets.symmetric(
-                                    vertical: 12, horizontal: 20),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(AppConfig().radius))),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 5),
-                          child: DropdownSearch<String>(
-                            onChanged: (value) {
-                              status = value!;
-                            },
-                            items: (filter, infiniteScrollProps) =>
-                                optionsStatus,
-                            suffixProps: DropdownSuffixProps(
-                              dropdownButtonProps: DropdownButtonProps(
-                                iconClosed: Icon(Icons.keyboard_arrow_down),
-                                iconOpened: Icon(Icons.keyboard_arrow_up),
-                              ),
-                            ),
-                            decoratorProps: DropDownDecoratorProps(
-                              textAlign: TextAlign.left,
-                              decoration: InputDecoration(
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 20),
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: AppConfig().primaryColor,
-                                      width: 2.5),
-                                  borderRadius:
-                                      BorderRadius.circular(AppConfig().radius),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: AppConfig().primaryColor,
-                                      width: 2.5),
-                                  borderRadius:
-                                      BorderRadius.circular(AppConfig().radius),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: AppConfig().primaryColor,
-                                      width: 2.5),
-                                  borderRadius:
-                                      BorderRadius.circular(AppConfig().radius),
-                                ),
-                                hintText: 'Estado',
-                              ),
-                            ),
-                            popupProps: PopupProps.menu(
-                              showSearchBox: true,
-                              searchFieldProps: TextFieldProps(
-                                  decoration: InputDecoration(
-                                hintText: "Pesquisar",
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        width: 2.5,
-                                        color: AppConfig().primaryColor),
-                                    borderRadius: BorderRadius.circular(
-                                        AppConfig().radius)),
-                              )),
-                              itemBuilder:
-                                  (context, item, isDisabled, isSelected) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 20),
-                                  child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 20),
-                                      decoration: BoxDecoration(
-                                        color: AppConfig().primaryColor,
-                                        borderRadius: BorderRadius.circular(
-                                            AppConfig().radius),
-                                      ),
-                                      child: Text(
-                                        item,
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18),
-                                        textAlign: TextAlign.left,
-                                      )),
-                                );
-                              },
-                              constraints: BoxConstraints(),
-                              menuProps: MenuProps(
-                                margin: EdgeInsets.symmetric(
-                                    vertical: 12, horizontal: 20),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(AppConfig().radius))),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 5),
-                          child: Input(
-                            function: () => selectData(context),
-                            onlyRead: true,
-                            label: "Data",
-                            controler: date,
-                            type: TextInputType.datetime,
-                          ),
-                        ),
-                        Container(
-                          child: files.isNotEmpty
-                              ? Wrap(
-                                    alignment: WrapAlignment.center,
-                                    runAlignment: WrapAlignment.center,
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.center,
-                                    spacing: 6,
-                                    children: files.map((file) => file.endsWith('.pdf') ? 
-                                              Container(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.2,
-                                                height: MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.12,
-                                                child: GestureDetector(
-                                                  onTap: () =>
-                                                      AttachmentFocus(file),
-                                                  child: AbsorbPointer(
-                                                    child: SfPdfViewer.file(File(file),
-                                                    ),
-                                                  ),
-                                                ),
-                                              )
-                                            : Container(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.2,
-                                                height: MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.2,
-                                                child: GestureDetector(
-                                                  onTap: () =>
-                                                      AttachmentFocus(file),
-                                                  child:
-                                                      Image.file(File(file)),
-                                                ),
-                                              ),
-                                    ).toList(),
-                                  )
-                              : GestureDetector(
-                                  onTap: pickFile,
-                                  child: Container(
-                                    margin: const EdgeInsets.only(top: 10),
-                                    height: 40,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(40),
-                                        color: AppConfig().primaryColor),
-                                    child: const Icon(
-                                      Icons.add,
-                                      color: Colors.white,
+                                    child: Input(
+                                      label: "+351",
+                                      controler: client_number_code,
+                                      type: TextInputType.numberWithOptions(),
                                     ),
                                   ),
                                 ),
-                        ), // Container(
-                        //   width: double.infinity,
-                        //   margin: EdgeInsets.symmetric(vertical: 10),
-                        //   child: Column(
-                        //     children: [
-                        //       Container(
-                        //         margin: EdgeInsets.symmetric(vertical: 10),
-                        //         child: Text(
-                        //           "Funcionários",
-                        //           style: TextStyle(
-                        //               fontSize: 18, fontWeight: FontWeight.w500),
-                        //         ),
-                        //       ),
-                        //       Wrap(
-                        //         spacing: 3,
-                        //         runSpacing: 3,
-                        //         alignment: WrapAlignment.center,
-                        //         children: [
-                        //           Container(
-                        //             padding: EdgeInsets.symmetric(
-                        //                 horizontal: 8, vertical: 5),
-                        //             decoration: BoxDecoration(
-                        //               borderRadius:
-                        //                   BorderRadius.circular(AppConfig().radius),
-                        //               color: AppConfig().primaryColor,
-                        //             ),
-                        //             child: Text(
-                        //               "João Costa",
-                        //               style: TextStyle(
-                        //                 fontWeight: FontWeight.w500,
-                        //                 color: Colors.white,
-                        //               ),
-                        //             ),
-                        //           ),
-                        //           Container(
-                        //             padding: EdgeInsets.symmetric(
-                        //                 horizontal: 8, vertical: 5),
-                        //             decoration: BoxDecoration(
-                        //               borderRadius:
-                        //                   BorderRadius.circular(AppConfig().radius),
-                        //               color: AppConfig().primaryColor,
-                        //             ),
-                        //             child: Text(
-                        //               "Maria Silva",
-                        //               style: TextStyle(
-                        //                 fontWeight: FontWeight.w500,
-                        //                 color: Colors.white,
-                        //               ),
-                        //             ),
-                        //           ),
-                        //           Container(
-                        //             padding: EdgeInsets.symmetric(
-                        //                 horizontal: 8, vertical: 5),
-                        //             decoration: BoxDecoration(
-                        //               borderRadius:
-                        //                   BorderRadius.circular(AppConfig().radius),
-                        //               color: AppConfig().primaryColor,
-                        //             ),
-                        //             child: Text(
-                        //               "Carlos Santos",
-                        //               style: TextStyle(
-                        //                 fontWeight: FontWeight.w500,
-                        //                 color: Colors.white,
-                        //               ),
-                        //             ),
-                        //           ),
-                        //           Container(
-                        //             padding: EdgeInsets.symmetric(
-                        //                 horizontal: 8, vertical: 5),
-                        //             decoration: BoxDecoration(
-                        //               borderRadius:
-                        //                   BorderRadius.circular(AppConfig().radius),
-                        //               color: AppConfig().primaryColor,
-                        //             ),
-                        //             child: Text(
-                        //               "Ana Oliveira",
-                        //               style: TextStyle(
-                        //                 fontWeight: FontWeight.w500,
-                        //                 color: Colors.white,
-                        //               ),
-                        //             ),
-                        //           ),
-                        //           Container(
-                        //             padding: EdgeInsets.symmetric(
-                        //                 horizontal: 8, vertical: 5),
-                        //             decoration: BoxDecoration(
-                        //               borderRadius:
-                        //                   BorderRadius.circular(AppConfig().radius),
-                        //               color: AppConfig().primaryColor,
-                        //             ),
-                        //             child: Text(
-                        //               "Pedro Lima",
-                        //               style: TextStyle(
-                        //                 fontWeight: FontWeight.w500,
-                        //                 color: Colors.white,
-                        //               ),
-                        //             ),
-                        //           ),
-                        //           Container(
-                        //             padding: EdgeInsets.symmetric(
-                        //                 horizontal: 8, vertical: 5),
-                        //             decoration: BoxDecoration(
-                        //               borderRadius:
-                        //                   BorderRadius.circular(AppConfig().radius),
-                        //               color: AppConfig().primaryColor,
-                        //             ),
-                        //             child: Text(
-                        //               "Rafael Ferreira",
-                        //               style: TextStyle(
-                        //                 fontWeight: FontWeight.w500,
-                        //                 color: Colors.white,
-                        //               ),
-                        //             ),
-                        //           ),
-                        //           Container(
-                        //             padding: EdgeInsets.symmetric(
-                        //                 horizontal: 5, vertical: 5),
-                        //             decoration: BoxDecoration(
-                        //               borderRadius:
-                        //                   BorderRadius.circular(AppConfig().radius),
-                        //               color: AppConfig().primaryColor,
-                        //             ),
-                        //             child: Icon(
-                        //               Icons.add,
-                        //               color: Colors.white,
-                        //             ),
-                        //           ),
-                        //         ],
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-                        Container(
-                          margin: const EdgeInsets.only(top: 20),
-                          width: double.infinity,
-                          child: Button(
-                            loading: uploading,
-                            text: "Adcionar",
-                            func: () => Create(),
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                Expanded(
+                                  flex: 7,
+                                  child: Input(
+                                    label: "Número do cliente",
+                                    controler: client_number,
+                                    type: TextInputType.phone,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 5),
+                            child: Input(
+                                label: "Endereço completo", controler: address),
+                          ),
+                          Dropdown(data: locations, label: "Local"),
+                          Dropdown(data: optionsGoal, label: "Objetivo"),
+                          Dropdown(data: optionsStatus, label: "Estado"),
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 5),
+                            child: Input(
+                              function: () => selectData(context),
+                              onlyRead: true,
+                              label: "Data",
+                              controler: date,
+                              type: TextInputType.datetime,
+                            ),
+                          ),
+                          Attachment(
+                              label: "Anexos",
+                              isImageOnly: true), //   width: double.infinity
+                          //   margin: EdgeInsets.symmetric(vertical: 10),
+                          //   child: Column(
+                          //     children: [
+                          //       Container(
+                          //         margin: EdgeInsets.symmetric(vertical: 10),
+                          //         child: Text(
+                          //           "Funcionários",
+                          //           style: TextStyle(
+                          //               fontSize: 18, fontWeight: FontWeight.w500),
+                          //         ),
+                          //       ),
+                          //       Wrap(
+                          //         spacing: 3,
+                          //         runSpacing: 3,
+                          //         alignment: WrapAlignment.center,
+                          //         children: [
+                          //           Container(
+                          //             padding: EdgeInsets.symmetric(
+                          //                 horizontal: 8, vertical: 5),
+                          //             decoration: BoxDecoration(
+                          //               borderRadius:
+                          //                   BorderRadius.circular(AppConfig().radius),
+                          //               color: AppConfig().primaryColor,
+                          //             ),
+                          //             child: Text(
+                          //               "João Costa",
+                          //               style: TextStyle(
+                          //                 fontWeight: FontWeight.w500,
+                          //                 color: Colors.white,
+                          //               ),
+                          //             ),
+                          //           ),
+                          //           Container(
+                          //             padding: EdgeInsets.symmetric(
+                          //                 horizontal: 8, vertical: 5),
+                          //             decoration: BoxDecoration(
+                          //               borderRadius:
+                          //                   BorderRadius.circular(AppConfig().radius),
+                          //               color: AppConfig().primaryColor,
+                          //             ),
+                          //             child: Text(
+                          //               "Maria Silva",
+                          //               style: TextStyle(
+                          //                 fontWeight: FontWeight.w500,
+                          //                 color: Colors.white,
+                          //               ),
+                          //             ),
+                          //           ),
+                          //           Container(
+                          //             padding: EdgeInsets.symmetric(
+                          //                 horizontal: 8, vertical: 5),
+                          //             decoration: BoxDecoration(
+                          //               borderRadius:
+                          //                   BorderRadius.circular(AppConfig().radius),
+                          //               color: AppConfig().primaryColor,
+                          //             ),
+                          //             child: Text(
+                          //               "Carlos Santos",
+                          //               style: TextStyle(
+                          //                 fontWeight: FontWeight.w500,
+                          //                 color: Colors.white,
+                          //               ),
+                          //             ),
+                          //           ),
+                          //           Container(
+                          //             padding: EdgeInsets.symmetric(
+                          //                 horizontal: 8, vertical: 5),
+                          //             decoration: BoxDecoration(
+                          //               borderRadius:
+                          //                   BorderRadius.circular(AppConfig().radius),
+                          //               color: AppConfig().primaryColor,
+                          //             ),
+                          //             child: Text(
+                          //               "Ana Oliveira",
+                          //               style: TextStyle(
+                          //                 fontWeight: FontWeight.w500,
+                          //                 color: Colors.white,
+                          //               ),
+                          //             ),
+                          //           ),
+                          //           Container(
+                          //             padding: EdgeInsets.symmetric(
+                          //                 horizontal: 8, vertical: 5),
+                          //             decoration: BoxDecoration(
+                          //               borderRadius:
+                          //                   BorderRadius.circular(AppConfig().radius),
+                          //               color: AppConfig().primaryColor,
+                          //             ),
+                          //             child: Text(
+                          //               "Pedro Lima",
+                          //               style: TextStyle(
+                          //                 fontWeight: FontWeight.w500,
+                          //                 color: Colors.white,
+                          //               ),
+                          //             ),
+                          //           ),
+                          //           Container(
+                          //             padding: EdgeInsets.symmetric(
+                          //                 horizontal: 8, vertical: 5),
+                          //             decoration: BoxDecoration(
+                          //               borderRadius:
+                          //                   BorderRadius.circular(AppConfig().radius),
+                          //               color: AppConfig().primaryColor,
+                          //             ),
+                          //             child: Text(
+                          //               "Rafael Ferreira",
+                          //               style: TextStyle(
+                          //                 fontWeight: FontWeight.w500,
+                          //                 color: Colors.white,
+                          //               ),
+                          //             ),
+                          //           ),
+                          //           Container(
+                          //             padding: EdgeInsets.symmetric(
+                          //                 horizontal: 5, vertical: 5),
+                          //             decoration: BoxDecoration(
+                          //               borderRadius:
+                          //                   BorderRadius.circular(AppConfig().radius),
+                          //               color: AppConfig().primaryColor,
+                          //             ),
+                          //             child: Icon(
+                          //               Icons.add,
+                          //               color: Colors.white,
+                          //             ),
+                          //           ),
+                          //         ],
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
+                          Container(
+                            margin: const EdgeInsets.only(top: 20),
+                            width: double.infinity,
+                            child: Button(
+                              loading: uploading,
+                              text: "Adcionar",
+                              func: () => Create(),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ),

@@ -5,6 +5,6 @@ class AppConfig {
   final Color overlayColor = const Color.fromARGB(255, 240, 240, 240);
   final Color backgroundColor = Colors.white;
   final Color textColorW = const Color.fromARGB(255, 50, 50, 50);
-  final double radius = 20;
+  final double radius = 15;
   final double padidng = 20;
 }

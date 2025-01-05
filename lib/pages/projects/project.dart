@@ -3,6 +3,7 @@
 import 'dart:typed_data';
 import 'package:eslar/components/button.dart';
 import 'package:eslar/pages/projects/startVisit.dart';
+import 'package:eslar/pages/projects/viewVisit.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:eslar/components/AppConfig.dart';
@@ -18,25 +19,9 @@ class Project extends StatefulWidget {
 }
 
 class _ProjectState extends State<Project> {
-  List<dynamic> dataProject = [
-    {
-      'CLIENT_NAME': 'João Silva',
-      'GOAL': 'Instalação de paineis fotovoltaicos.',
-      'STATUS': 'Em andamento',
-      'LOCATION': 'Lisboa',
-      'ADDRESS': 'Rua das Flores, 123',
-      'DATE_PROJECT': '2024-12-15',
-      'PHONE_CODE': '351',
-      'PHONE': '912345678',
-      'UPLOADED_FILES': jsonEncode([
-        base64Encode(
-            Uint8List.fromList([0x25, 0x50, 0x44, 0x46])), // Exemplo de PDF
-        base64Encode(Uint8List.fromList(
-            [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A])), // Exemplo de PNG
-      ]),
-      'ID': '1'
-    }
-  ];
+  List<dynamic> dataProject = [];
+
+  var visits;
 
   List<List<int>> Attachments = [];
   void ProcessFile(List<String> fileEncoded) {
@@ -108,6 +93,82 @@ class _ProjectState extends State<Project> {
     );
   }
 
+  Future<void> GetVisits() async {
+    final url = Uri.parse('https://tze.ddns.net:8108/getVisits.php');
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({
+      'id': 2,
+    });
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        setState(() {
+          visits = data['data'];
+        });
+        print("Veio ate aq ${visits}");
+      } else {
+        print('Erro: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erro na requisição: $e');
+    }
+  }
+
+  Future<void> showVisitModal() async {
+    await GetVisits(); // Espera a função GetVisits() ser completada
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+          margin: const EdgeInsets.only(top: 10, bottom: 20),
+          width: double.infinity,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Ver Visita",
+                style: TextStyle(
+                    color: AppConfig().textColorW,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 40),
+              ),
+              Center(
+                child: visits == null || visits.isEmpty
+                    ? CircularProgressIndicator(
+                        color: AppConfig().primaryColor,
+                      )
+                    : Column(
+                        children: visits.map<Widget>((visit) {
+                          return Container(
+                            margin: EdgeInsets.only(top: 10),
+                            width: double.infinity,
+                            child: Button(
+                              text: "Visita - ${visit['NAME']}",
+                              func: () {
+                                print("ID: ${visit['ID'].toString()}");
+                                 Navigator.push(
+                                     context,
+                                     MaterialPageRoute(
+                                         builder: (context) => ViewVisit(
+                                               id: visit['ID'].toString(),
+                                             )));
+                              },
+                            ),
+                          );
+                        }).toList(),
+                      ),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> GetProject() async {
     final url = Uri.parse('https://tze.ddns.net:8108/getProject.php');
     final headers = {'Content-Type': 'application/json'};
@@ -172,6 +233,8 @@ class _ProjectState extends State<Project> {
                     child: Container(
                       padding: EdgeInsets.all(AppConfig().padidng),
                       decoration: BoxDecoration(
+                        border: Border.all(
+                            color: AppConfig().textColorW, width: 0.2),
                         borderRadius: BorderRadius.circular(AppConfig().radius),
                         color: AppConfig().backgroundColor,
                       ),
@@ -320,75 +383,133 @@ class _ProjectState extends State<Project> {
                               ],
                             ),
                           ),
-                          Attachments.isEmpty
-                              ? Container(
-                                  child: Text("Sem imagem"),
-                                )
-                              : Container(
-                                  width: double.infinity,
-                                  child: Wrap(
-                                    alignment: WrapAlignment.center,
-                                    runAlignment: WrapAlignment.center,
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.center,
-                                    spacing: 6,
-                                    children: Attachments.map(
-                                      (fileBytes) {
-                                        Uint8List uint8List =
-                                            Uint8List.fromList(fileBytes);
-                                        bool isPdf(List<int> fileBytesMeeter) {
-                                          return fileBytes.length >= 4 &&
-                                              fileBytesMeeter[0] == 0x25 &&
-                                              fileBytesMeeter[1] == 0x50 &&
-                                              fileBytesMeeter[2] == 0x44 &&
-                                              fileBytesMeeter[3] == 0x46;
-                                        }
-
-                                        return isPdf(fileBytes)
-                                            ? Container(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.2,
-                                                height: MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.16,
-                                                child: GestureDetector(
-                                                  onTap: () => AttachmentFocus(
-                                                      uint8List),
-                                                  child: AbsorbPointer(
-                                                    child: SfPdfViewer.memory(
-                                                      uint8List,
-                                                    ),
-                                                  ),
-                                                ),
-                                              )
-                                            : Container(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.2,
-                                                height: MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.2,
-                                                child: GestureDetector(
-                                                  onTap: () => AttachmentFocus(
-                                                      uint8List),
-                                                  child:
-                                                      Image.memory(uint8List),
-                                                ),
-                                              );
-                                      },
-                                    ).toList(),
-                                  ),
-                                ),
                           Container(
                             margin: const EdgeInsets.only(top: 10),
                             width: double.infinity,
                             child: Button(
-                              text: "Iniciar Visita",
+                              text: "Mostrar Anexos",
+                              func: () {
+                                showModalBottomSheet(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return Column(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.only(
+                                                top: 20, left: 20, right: 20),
+                                            margin: const EdgeInsets.only(
+                                                top: 10, bottom: 20),
+                                            width: double.infinity,
+                                            child: Text(
+                                              "Anexos",
+                                              style: TextStyle(
+                                                  color: AppConfig().textColorW,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 40),
+                                            ),
+                                          ),
+                                          Attachments.isEmpty
+                                              ? Container(
+                                                  child: Text("Sem imagem"),
+                                                )
+                                              : Container(
+                                                  width: double.infinity,
+                                                  child: Wrap(
+                                                    alignment:
+                                                        WrapAlignment.center,
+                                                    runAlignment:
+                                                        WrapAlignment.center,
+                                                    crossAxisAlignment:
+                                                        WrapCrossAlignment
+                                                            .center,
+                                                    spacing: 6,
+                                                    children: Attachments.map(
+                                                      (fileBytes) {
+                                                        Uint8List uint8List =
+                                                            Uint8List.fromList(
+                                                                fileBytes);
+                                                        bool isPdf(
+                                                            List<int>
+                                                                fileBytesMeeter) {
+                                                          return fileBytes
+                                                                      .length >=
+                                                                  4 &&
+                                                              fileBytesMeeter[
+                                                                      0] ==
+                                                                  0x25 &&
+                                                              fileBytesMeeter[
+                                                                      1] ==
+                                                                  0x50 &&
+                                                              fileBytesMeeter[
+                                                                      2] ==
+                                                                  0x44 &&
+                                                              fileBytesMeeter[
+                                                                      3] ==
+                                                                  0x46;
+                                                        }
+
+                                                        return isPdf(fileBytes)
+                                                            ? Container(
+                                                                width: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .width *
+                                                                    0.2,
+                                                                height: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .height *
+                                                                    0.16,
+                                                                child:
+                                                                    GestureDetector(
+                                                                  onTap: () =>
+                                                                      AttachmentFocus(
+                                                                          uint8List),
+                                                                  child:
+                                                                      AbsorbPointer(
+                                                                    child: SfPdfViewer
+                                                                        .memory(
+                                                                      uint8List,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              )
+                                                            : Container(
+                                                                width: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .width *
+                                                                    0.2,
+                                                                height: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .height *
+                                                                    0.2,
+                                                                child:
+                                                                    GestureDetector(
+                                                                  onTap: () =>
+                                                                      AttachmentFocus(
+                                                                          uint8List),
+                                                                  child: Image
+                                                                      .memory(
+                                                                          uint8List),
+                                                                ),
+                                                              );
+                                                      },
+                                                    ).toList(),
+                                                  ),
+                                                ),
+                                        ],
+                                      );
+                                    });
+                              },
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.only(top: 10),
+                            width: double.infinity,
+                            child: Button(
+                              text: "Nova Visita",
                               func: () {
                                 Navigator.push(
                                     context,
@@ -403,12 +524,12 @@ class _ProjectState extends State<Project> {
                             margin: const EdgeInsets.only(top: 10),
                             width: double.infinity,
                             child: Button(
-                              text: "Cancelar",
-                              func: () {},
-                              outlined: true,
-                              colorChoose: Colors.red,
+                              text: "Visitas",
+                              func: () {
+                                showVisitModal();
+                              },
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),

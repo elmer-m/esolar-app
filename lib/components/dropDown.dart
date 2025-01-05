@@ -44,19 +44,19 @@ class _DropdownState extends State<Dropdown> {
                           contentPadding: EdgeInsets.symmetric(horizontal: 20),
                           border: OutlineInputBorder(
                             borderSide: BorderSide(
-                                color: AppConfig().primaryColor, width: 2.5),
+                                color: AppConfig().textColorW, width: 1.5),
                             borderRadius:
                                 BorderRadius.circular(AppConfig().radius),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                                color: AppConfig().primaryColor, width: 2.5),
+                                color: AppConfig().primaryColor, width: 1.5),
                             borderRadius:
                                 BorderRadius.circular(AppConfig().radius),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                                color: AppConfig().primaryColor, width: 2.5),
+                                color: AppConfig().textColorW, width: 1.5),
                             borderRadius:
                                 BorderRadius.circular(AppConfig().radius),
                           ),
@@ -70,7 +70,7 @@ class _DropdownState extends State<Dropdown> {
                           hintText: "Pesquisar",
                           border: OutlineInputBorder(
                               borderSide: BorderSide(
-                                  width: 2.5, color: AppConfig().primaryColor),
+                                  width: 1.5, color: AppConfig().primaryColor),
                               borderRadius:
                                   BorderRadius.circular(AppConfig().radius),),
                         ),),

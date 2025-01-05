@@ -41,65 +41,17 @@ class _DashboardState extends State<Dashboard> {
             backgroundColor: AppConfig().primaryColor,
             child: Icon(Icons.add),) : null,
       body: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        
         child: Column(
           children: [
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 30),
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppConfig().radius),
-                color: AppConfig().primaryColor,
-              ),
-              child: Row(
-                children: [
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Olá!",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Text(
-                        "João Costa!",
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  Container(
-                    child: selectedIndex == 0
-                        ? const Text(
-                            "Inicio",
-                            style: TextStyle(fontSize: 25, color: Colors.white),
-                          )
-                        : selectedIndex == 1
-                            ? const Text(
-                                "Projetos",
-                                style: TextStyle(
-                                    fontSize: 25, color: Colors.white),
-                              )
-                            : const Text(
-                                "Conta",
-                                style: TextStyle(
-                                    fontSize: 25, color: Colors.white),
-                              ),
-                  )
-                ],
-              ),
-            ),
-            pages[selectedIndex],
+              pages[selectedIndex],
           ],
         ),
       ),
       bottomNavigationBar: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(AppConfig().radius),),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(AppConfig().radius),
           child: BottomNavigationBar(
             selectedItemColor: Colors.white,
             selectedFontSize: 15,

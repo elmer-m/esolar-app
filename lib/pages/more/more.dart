@@ -26,6 +26,18 @@ class _MoreState extends State<More> {
         ),
         child: Column(
           children: [
+                            Container(
+                padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
+                margin: const EdgeInsets.only(top: 10, bottom: 30),
+                width: double.infinity,
+                child: Text(
+                  "Mais",
+                  style: TextStyle(
+                      color: AppConfig().textColorW,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 40),
+                ),
+              ),
             ToPage(page: Config(), pageLabel: "Definições"),
             ToPage(page: Account(), pageLabel: "Conta"),
             ToPage(page: ProjectsFinished(), pageLabel: "Projetos"),
