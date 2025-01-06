@@ -12,7 +12,7 @@ import 'package:eslar/components/dropDown.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 class StartVisit extends StatefulWidget {
-  final int id;
+  final String id;
   const StartVisit({super.key, required this.id});
 
   @override
@@ -104,6 +104,7 @@ class _StartVisitState extends State<StartVisit> {
       }
       setState(() {
         uploading = false;
+        Navigator.pop(context, "visit");
       });
     } catch (e) {
       print("Erro na requisição: $e");

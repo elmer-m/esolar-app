@@ -20,7 +20,8 @@ class Project extends StatefulWidget {
 
 class _ProjectState extends State<Project> {
   List<dynamic> dataProject = [];
-
+  bool haveVisits = false;
+  bool showVisitLoding = false;
   var visits;
 
   List<List<int>> Attachments = [];
@@ -97,7 +98,7 @@ class _ProjectState extends State<Project> {
     final url = Uri.parse('https://tze.ddns.net:8108/getVisits.php');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
-      'id': 2,
+      'id': widget.id,
     });
     try {
       final response = await http.post(url, headers: headers, body: body);
@@ -105,6 +106,10 @@ class _ProjectState extends State<Project> {
         var data = jsonDecode(response.body);
         setState(() {
           visits = data['data'];
+          haveVisits = visits.isEmpty ? false : true;
+          visits.isEmpty
+              ? print("Não tem visitas $haveVisits")
+              : print("tem visitas $haveVisits");
         });
         print("Veio ate aq ${visits}");
       } else {
@@ -116,8 +121,10 @@ class _ProjectState extends State<Project> {
   }
 
   Future<void> showVisitModal() async {
-    await GetVisits(); // Espera a função GetVisits() ser completada
-
+    setState(() {
+      showVisitLoding = true;
+    });
+    await GetVisits();
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -132,41 +139,77 @@ class _ProjectState extends State<Project> {
               Text(
                 "Ver Visita",
                 style: TextStyle(
-                    color: AppConfig().textColorW,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 40),
+                  color: AppConfig().textColorW,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 40,
+                ),
               ),
               Center(
-                child: visits == null || visits.isEmpty
-                    ? CircularProgressIndicator(
-                        color: AppConfig().primaryColor,
-                      )
-                    : Column(
-                        children: visits.map<Widget>((visit) {
-                          return Container(
-                            margin: EdgeInsets.only(top: 10),
-                            width: double.infinity,
-                            child: Button(
-                              text: "Visita - ${visit['NAME']}",
-                              func: () {
-                                print("ID: ${visit['ID'].toString()}");
-                                 Navigator.push(
-                                     context,
-                                     MaterialPageRoute(
-                                         builder: (context) => ViewVisit(
-                                               id: visit['ID'].toString(),
-                                             )));
-                              },
+                child: visits.isEmpty && !haveVisits
+                    ? Container(
+                        margin: EdgeInsets.symmetric(vertical: 20),
+                        child: Center(
+                          child: Text(
+                            "Não há visitas neste projeto.",
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                              color: Color.fromARGB(255, 99, 99, 99),
                             ),
-                          );
-                        }).toList(),
+                          ),
+                        ),
+                      )
+                    : Expanded(
+                        // Adicione o Expanded aqui
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: visits.map<Widget>((visit) {
+                              return Container(
+                                margin: EdgeInsets.only(top: 10),
+                                width: double.infinity,
+                                child: Button(
+                                  text: "Visita - ${visit['NAME']}",
+                                  func: () {
+                                    print("ID: ${visit['ID'].toString()}");
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ViewVisit(
+                                          id: visit['ID'].toString(),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
                       ),
-              )
+              ),
             ],
           ),
         );
       },
     );
+        setState(() {
+      showVisitLoding = false;
+    });
+  }
+
+  Future<void> NewVisit() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => StartVisit(
+          id: widget.id,
+        ),
+      ),
+    );
+
+    if (result != null) {
+      showVisitModal();
+    }
   }
 
   Future<void> GetProject() async {
@@ -511,12 +554,7 @@ class _ProjectState extends State<Project> {
                             child: Button(
                               text: "Nova Visita",
                               func: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => StartVisit(
-                                              id: 2,
-                                            )));
+                                NewVisit();
                               },
                             ),
                           ),
@@ -525,6 +563,7 @@ class _ProjectState extends State<Project> {
                             width: double.infinity,
                             child: Button(
                               text: "Visitas",
+                              loading: showVisitLoding,
                               func: () {
                                 showVisitModal();
                               },

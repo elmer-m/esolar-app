@@ -75,22 +75,24 @@ class _ViewVisitState extends State<ViewVisit> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                width: double.infinity * 0.80,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Center(
-                  child: visitData == null
-                      ? const CircularProgressIndicator()
-                      : SingleChildScrollView(
+      body: visitData == null
+          ? Center(
+              child: CircularProgressIndicator(color: AppConfig().primaryColor,),
+            )
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 20),
+                      width: double.infinity * 0.80,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Center(
+                        child: SingleChildScrollView(
                           child: Container(
                             padding: EdgeInsets.all(AppConfig().padidng),
                             decoration: BoxDecoration(
@@ -228,165 +230,180 @@ class _ViewVisitState extends State<ViewVisit> {
                             ),
                           ),
                         ),
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                width: double.infinity * 0.80,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Center(
-                  child: SingleChildScrollView(
-                    child: Container(
-                      padding: EdgeInsets.all(AppConfig().padidng),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                            color: AppConfig().textColorW, width: 0.2),
-                        borderRadius: BorderRadius.circular(AppConfig().radius),
-                        color: AppConfig().backgroundColor,
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      width: double.infinity * 0.80,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Center(
+                        child: SingleChildScrollView(
+                          child: Container(
+                            padding: EdgeInsets.all(AppConfig().padidng),
                             decoration: BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                  color: AppConfig().textColorW,
-                                  width: 0.2,
-                                ),
-                              ),
-                            ),
-                            child: Text(
-                              "Anexos",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 20),
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            decoration: BoxDecoration(
-                              border: Border(
-                                bottom: BorderSide(
-                                  color: AppConfig().textColorW,
-                                  width: 0.2,
-                                ),
-                              ),
+                              border: Border.all(
+                                  color: AppConfig().textColorW, width: 0.2),
+                              borderRadius:
+                                  BorderRadius.circular(AppConfig().radius),
+                              color: AppConfig().backgroundColor,
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-                                  child: Text(
-                                    "Exterior Casa",
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w300,
-                                      color: Color.fromARGB(255, 99, 99, 99),
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: AppConfig().textColorW,
+                                        width: 0.2,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(top: 5, bottom: 10),
-                                  child: SeeFiles(files: houseFiles),
-                                ),
-                                Container(
                                   child: Text(
-                                    "Contador Elétrico",
+                                    "Anexos",
                                     style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w300,
-                                      color: Color.fromARGB(255, 99, 99, 99),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(top: 5, bottom: 10),
-                                  child: SeeFiles(files: counterFiles),
-                                ),
-                                Container(
-                                  child: Text(
-                                    "Painel Elétrico",
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w300,
-                                      color: Color.fromARGB(255, 99, 99, 99),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(top: 5, bottom: 10),
-                                  child: SeeFiles(files: panelFiles),
-                                ),
-                                Container(
-                                  child: Text(
-                                    "Faturas",
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w300,
-                                      color: Color.fromARGB(255, 99, 99, 99),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(top: 5, bottom: 10),
-                                  child: SeeFiles(files: invoicesFiles),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(bottom: 5),
-                                  child: Text(
-                                    "Nota",
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w300,
-                                      color: Color.fromARGB(255, 99, 99, 99),
-                                    ),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20),
                                   ),
                                 ),
                                 Container(
                                   margin: const EdgeInsets.only(bottom: 10),
-                                  child: Text(
-                                    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-                                    style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w400),
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: AppConfig().textColorW,
+                                        width: 0.2,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        child: Text(
+                                          "Exterior Casa",
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w300,
+                                            color:
+                                                Color.fromARGB(255, 99, 99, 99),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        margin:
+                                            EdgeInsets.only(top: 5, bottom: 10),
+                                        child: SeeFiles(files: houseFiles),
+                                      ),
+                                      Container(
+                                        child: Text(
+                                          "Contador Elétrico",
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w300,
+                                            color:
+                                                Color.fromARGB(255, 99, 99, 99),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        margin:
+                                            EdgeInsets.only(top: 5, bottom: 10),
+                                        child: SeeFiles(files: counterFiles),
+                                      ),
+                                      Container(
+                                        child: Text(
+                                          "Painel Elétrico",
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w300,
+                                            color:
+                                                Color.fromARGB(255, 99, 99, 99),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        margin:
+                                            EdgeInsets.only(top: 5, bottom: 10),
+                                        child: SeeFiles(files: panelFiles),
+                                      ),
+                                      Container(
+                                        child: Text(
+                                          "Faturas",
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w300,
+                                            color:
+                                                Color.fromARGB(255, 99, 99, 99),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        margin:
+                                            EdgeInsets.only(top: 5, bottom: 10),
+                                        child: SeeFiles(files: invoicesFiles),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        margin:
+                                            const EdgeInsets.only(bottom: 5),
+                                        child: Text(
+                                          "Nota",
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w300,
+                                            color:
+                                                Color.fromARGB(255, 99, 99, 99),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        margin:
+                                            const EdgeInsets.only(bottom: 10),
+                                        child: Text(
+                                          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                                          style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }
