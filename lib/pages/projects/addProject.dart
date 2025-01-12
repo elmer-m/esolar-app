@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:eslar/components/dropDown.dart';
 import 'package:eslar/components/sendAttachment.dart';
+import 'package:eslar/pages/projects/project.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:eslar/components/button.dart';
@@ -25,16 +26,18 @@ class _AddProjectState extends State<AddProject> {
   TextEditingController client_number = TextEditingController();
   TextEditingController client_number_code = TextEditingController();
   TextEditingController date = TextEditingController();
-  TextEditingController location = TextEditingController();
   TextEditingController address = TextEditingController();
 
   String phone_code = "";
+  String location = "";
   String goal = "";
   String status = "";
 
   List<String> files = [];
   List<String> optionsGoal = [];
   List<String> optionsStatus = [];
+  List<List<String>> collaborators = [];
+  List<String> collaboratorsChosed = [];
 
   DateTime? selectedDate;
 
@@ -183,7 +186,6 @@ class _AddProjectState extends State<AddProject> {
     if (response.statusCode == 200) {
       try {
         var data = jsonDecode(response.body);
-        print("Data ${response.body}");
         setState(() {
           optionsGoal = List<String>.from(
               data['data'].map((item) => item['OBJETIVO'] as String));
@@ -202,13 +204,40 @@ class _AddProjectState extends State<AddProject> {
     if (response.statusCode == 200) {
       try {
         var data = jsonDecode(response.body);
-        print("Data ${response.body}");
         setState(() {
           optionsStatus = List<String>.from(
               data['data'].map((item) => item['ESTADO'] as String));
         });
       } catch (e) {
         print("Erro ao decodificar JSON: $e");
+      }
+    } else {
+      print("Erro ao fazer a requisição. Status: ${response.statusCode}");
+    }
+  }
+
+  Future<void> getUsers() async {
+    final url = Uri.parse('https://tze.ddns.net:8108/getUsers.php');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      try {
+        var data = jsonDecode(response.body);
+        var col = data['data'];
+        print('aqui');
+        setState(() {
+          // Faz o cast correto e mapeia cada item da lista para List<String>
+          collaborators = List<List<String>>.from(
+            col.map(
+              (item) => [
+                item['ID']?.toString() ?? 'Nulo',
+                "${item['FIRST_NAME']}  ${item['LAST_NAME']}",
+              ],
+            ),
+          );
+          print("Data Users ${collaborators}");
+        });
+      } catch (e) {
+        print("Erro : $e");
       }
     } else {
       print("Erro ao fazer a requisição. Status: ${response.statusCode}");
@@ -226,11 +255,12 @@ class _AddProjectState extends State<AddProject> {
       request.fields['client_name'] = client_name.text;
       request.fields['phone_code'] = client_number_code.text;
       request.fields['phone'] = client_number.text;
-      request.fields['location'] = location.text;
+      request.fields['location'] = location;
       request.fields['address'] = address.text;
       request.fields['goal'] = goal;
       request.fields['status'] = status;
       request.fields['date'] = date.text;
+      request.fields['collaborators'] = jsonEncode(collaboratorsChosed);
 
       for (String path in files) {
         File file = File(path);
@@ -242,6 +272,9 @@ class _AddProjectState extends State<AddProject> {
       final response = await http.Response.fromStream(streamResponse);
       if (response.statusCode == 200) {
         print("Deu certo:  ${response.body}");
+        var dataa = jsonDecode(response.body);
+        // Navigator.push(
+        // context, MaterialPageRoute(builder: (context) => Project(id: dataa['DATA']['ID'],)));
       } else {
         print("Deu errado, erro: ${response.statusCode}");
         print("Resposta: ${response.body}");
@@ -262,6 +295,7 @@ class _AddProjectState extends State<AddProject> {
     getLocations();
     getGoals();
     getStatus();
+    getUsers();
     super.initState();
   }
 
@@ -347,9 +381,108 @@ class _AddProjectState extends State<AddProject> {
                             child: Input(
                                 label: "Endereço completo", controler: address),
                           ),
-                          Dropdown(data: locations, label: "Local"),
-                          Dropdown(data: optionsGoal, label: "Objetivo"),
-                          Dropdown(data: optionsStatus, label: "Estado"),
+                          Dropdown(
+                            data: locations,
+                            label: "Local",
+                            onChanged: (value) {
+                              location = value;
+                              print("object $location");
+                            },
+                          ),
+                          Dropdown(
+                            data: optionsGoal,
+                            label: "Objetivo",
+                            onChanged: (value) {
+                              goal = value;
+                            },
+                          ),
+                          Dropdown(
+                            data: optionsStatus,
+                            label: "Estado",
+                            onChanged: (value) {
+                              status = value;
+                            },
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 5),
+                            child: DropdownSearch<String>.multiSelection(
+                              onChanged: (selectedNames) {
+                                print("$selectedNames $collaborators");
+                                setState(() {
+                                  collaboratorsChosed =
+                                      selectedNames.map((name) {
+                                    return collaborators.firstWhere(
+                                      (collab) =>
+                                          collab[1] ==
+                                          name, // Compara o ID no índice [0]
+                                      orElse: () => [
+                                        'N/A',
+                                        'N/A'
+                                      ], // Valor padrão se não encontrado
+                                    )[0]; // Retorna o nome no índice [1]
+                                  }).toList();
+                                  print(collaboratorsChosed);
+                                });
+                              },
+                              items: (filter, infiniteScrollProps) async {
+                                return collaborators.map((e) => e[1]).toList();
+                              },
+                              suffixProps: DropdownSuffixProps(
+                                dropdownButtonProps: DropdownButtonProps(
+                                  iconClosed: Icon(Icons.keyboard_arrow_down),
+                                  iconOpened: Icon(Icons.keyboard_arrow_up),
+                                ),
+                              ),
+                              decoratorProps: DropDownDecoratorProps(
+                                textAlign: TextAlign.left,
+                                decoration: InputDecoration(
+                                  contentPadding:
+                                      EdgeInsets.symmetric(horizontal: 20),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: AppConfig().textColorW,
+                                        width: 1.5),
+                                    borderRadius: BorderRadius.circular(
+                                        AppConfig().radius),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: AppConfig().primaryColor,
+                                        width: 1.5),
+                                    borderRadius: BorderRadius.circular(
+                                        AppConfig().radius),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: AppConfig().textColorW,
+                                        width: 1.5),
+                                    borderRadius: BorderRadius.circular(
+                                        AppConfig().radius),
+                                  ),
+                                  hintText: "Colaboradores",
+                                ),
+                              ),
+                              popupProps: PopupPropsMultiSelection.bottomSheet(
+                                checkBoxBuilder:
+                                    (context, item, isDisabled, isSelected) {
+                                  return Checkbox(
+                                    value: isSelected,
+                                    onChanged: (bool? selected) {
+                                      if (selected != null) {}
+                                    },
+                                    activeColor: AppConfig().primaryColor,
+                                    checkColor: Colors.white,
+                                  );
+                                },
+                                bottomSheetProps: BottomSheetProps(
+                                  shape: Border.all(
+                                      color: AppConfig().textColorW,
+                                      width: 0.2),
+                                  backgroundColor: AppConfig().backgroundColor,
+                                ),
+                              ),
+                            ),
+                          ),
                           Container(
                             margin: const EdgeInsets.symmetric(vertical: 5),
                             child: Input(
@@ -361,6 +494,9 @@ class _AddProjectState extends State<AddProject> {
                             ),
                           ),
                           Attachment(
+                              onChanged: (value) {
+                                files = value;
+                              },
                               label: "Anexos",
                               isImageOnly: true), //   width: double.infinity
                           //   margin: EdgeInsets.symmetric(vertical: 10),

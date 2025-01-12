@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:eslar/components/button.dart';
 import 'package:eslar/components/input.dart';
 import 'package:flutter/material.dart';
+import 'package:input_quantity/input_quantity.dart';
 import 'package:intl/intl.dart';
 import 'package:eslar/components/AppConfig.dart';
 import 'package:eslar/components/dropDown.dart';
@@ -22,6 +23,7 @@ class StartVisit extends StatefulWidget {
 class _StartVisitState extends State<StartVisit> {
   bool uploading = false;
   TextEditingController visita = new TextEditingController();
+  TextEditingController note = new TextEditingController();
   DateTime? selectedDate;
   List<String> files = [];
   List<String> invoice = [];
@@ -30,8 +32,76 @@ class _StartVisitState extends State<StartVisit> {
   List<String> external_house = [];
   List<String> eletrical_panel = [];
   List<String> eletrical_counter = [];
+  List<List<String>> materials = [];
   String instalation_tipology = "teste";
   String client_tipology = "teste";
+
+  Future<void> getInstallTypes() async {
+    final url = Uri.parse('https://tze.ddns.net:8108/getInstallTipology.php');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      try {
+        var data = jsonDecode(response.body);
+        setState(() {
+          instalation_tipology_types = List<String>.from(
+              data['data'].map((item) => item['TYPES'] as String));
+        });
+      } catch (e) {
+        print("Erro ao decodificar JSON: $e");
+      }
+    } else {
+      print("Erro ao fazer a requisição. Status: ${response.statusCode}");
+    }
+  }
+
+  Future<void> getClientTypes() async {
+    final url = Uri.parse('https://tze.ddns.net:8108/getClientTipology.php');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      try {
+        print(response.body);
+        var data = jsonDecode(response.body);
+
+        setState(() {
+          client_tipology_types = List<String>.from(
+              data['data'].map((item) => item['TYPES'] as String));
+        });
+      } catch (e) {
+        print("Erro ao decodificar JSON: $e");
+      }
+    } else {
+      print("Erro ao fazer a requisição. Status: ${response.statusCode}");
+    }
+  }
+
+  Future<void> getMaterials() async {
+    final url = Uri.parse('https://tze.ddns.net:8108/getMaterials.php');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      try {
+        var data = jsonDecode(response.body);
+        var col = data['data'];
+        print('aqui');
+        setState(() {
+          materials = List<List<String>>.from(
+            col.map(
+              (item) => [
+                item['ID']?.toString() ?? 'Nulo',
+                "${item['MATERIAL_NAME']}",
+                '0',
+                "${item['MATERIAL_PRICE']}",
+              ],
+            ),
+          );
+        });
+        print("Materiais: $materials");
+      } catch (e) {
+        print("Erro ao decodificar JSONsa: $e");
+      }
+    } else {
+      print("Erro ao fazer a requisição. Status: ${response.statusCode}");
+    }
+  }
 
   Future<void> pickFile() async {
     FilePickerResult? result =
@@ -51,7 +121,7 @@ class _StartVisitState extends State<StartVisit> {
               actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Fecha o dialog
+                    Navigator.of(context).pop();
                   },
                   child: const Text("Fechar"),
                 ),
@@ -73,6 +143,8 @@ class _StartVisitState extends State<StartVisit> {
       request.fields['client_tipology'] = client_tipology;
       request.fields['project_id'] = widget.id.toString();
       request.fields['name'] = visita.text;
+      request.fields['note'] = note.text;
+      request.fields['materials'] = jsonEncode(materials);
       for (String external_house_files in external_house) {
         File file = File(external_house_files);
         request.files.add(
@@ -117,6 +189,9 @@ class _StartVisitState extends State<StartVisit> {
   @override
   void initState() {
     super.initState();
+    getInstallTypes();
+    getClientTypes();
+    getMaterials();
   }
 
   @override
@@ -165,11 +240,75 @@ class _StartVisitState extends State<StartVisit> {
                     },
                   ),
                   Dropdown(
-                      onChanged: (value) {
-                        client_tipology = value;
+                    onChanged: (value) {
+                      client_tipology = value;
+                    },
+                    data: client_tipology_types,
+                    label: "Tipologia de cliente",
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 5),
+                    width: double.infinity,
+                    child: Button(
+                      text: "Materiais",
+                      func: () {
+                        AppConfig().Bottom(
+                          context,
+                          "Materiais",
+                          Container(
+                            child: Column(
+                              children: [
+                                Column(
+                                    children: materials.map<Widget>((material) {
+                                  return Container(
+                                      margin: EdgeInsets.only(bottom: 10),
+                                      padding: EdgeInsets.symmetric(vertical: 30),
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                              width: 0.2,
+                                              color: AppConfig().textColorW),
+                                        ),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.only(bottom: 5),
+                                            child: Text(
+                                              material[1],
+                                              style: TextStyle(fontSize: 20),
+                                            ),
+                                          ),
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                2,
+                                            child: InputQty.int(
+                                              initVal: int.parse(material[2]),
+                                              onQtyChanged: (value) {
+                                                material[2] = value.toString();
+                                                print(materials);
+                                              },
+                                              decoration: QtyDecorationProps(
+                                                borderShape:
+                                                    BorderShapeBtn.square,
+                                                btnColor:
+                                                    AppConfig().primaryColor,
+                                                isBordered: false,
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ));
+                                }).toList()),
+                              ],
+                            ),
+                          ),
+                        );
                       },
-                      data: client_tipology_types,
-                      label: "Tipologia de cliente"),
+                    ),
+                  ),
                   Attachment(
                     isImageOnly: false,
                     label: "Faturas (PDF)",
@@ -199,11 +338,15 @@ class _StartVisitState extends State<StartVisit> {
                     },
                   ),
                   Container(
+                    child: Input(label: "Nota(Opcional)", controler: note),
+                    margin: EdgeInsets.symmetric(vertical: 5),
+                  ),
+                  Container(
                     margin: const EdgeInsets.only(top: 20),
                     width: double.infinity,
                     child: Button(
                       loading: uploading,
-                      text: "Adcionar",
+                      text: "Adicionar",
                       func: () => Create(),
                     ),
                   ),

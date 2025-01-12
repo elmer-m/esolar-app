@@ -5,13 +5,13 @@ import 'package:dropdown_search/dropdown_search.dart';
 class Dropdown extends StatefulWidget {
   final List<String> data;
   final String label;
-  final void Function(String)? onChanged;
+  final Function(String) onChanged;
 
   const Dropdown({
     super.key,
     required this.data,
     required this.label,
-    this.onChanged,
+    required this.onChanged,
   });
 
   @override
@@ -27,9 +27,7 @@ class _DropdownState extends State<Dropdown> {
                     margin: const EdgeInsets.symmetric(vertical: 5),
                     child: DropdownSearch<String>(
                       onChanged: (value) {
-                        setState(() {
-                          selectedValue = value!;
-                        });
+                        widget.onChanged(value!);
                       },
                       items: (filter, infiniteScrollProps) => widget.data,
                       suffixProps: DropdownSuffixProps(

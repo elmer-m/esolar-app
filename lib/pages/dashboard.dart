@@ -1,4 +1,6 @@
+import 'package:eslar/components/toPage.dart';
 import 'package:eslar/pages/more/more.dart';
+import 'package:eslar/pages/projects/addMaterial.dart';
 import 'package:eslar/pages/projects/addProject.dart';
 import 'package:eslar/pages/home.dart';
 import 'package:eslar/pages/auth/login.dart';
@@ -29,28 +31,55 @@ class _DashboardState extends State<Dashboard> {
     });
   }
 
+  Future<void> GoProject() async {
+    print("ativou a função");
+    var result = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const AddProject()));
+    if (result != null) {
+      setState(
+        () {
+          onItemTapped(1);
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppConfig().overlayColor,
-      floatingActionButton:
-          selectedIndex == 1 ? FloatingActionButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const AddProject()));
-            },
-            backgroundColor: AppConfig().primaryColor,
-            child: Icon(Icons.add),) : null,
+      floatingActionButton: selectedIndex == 1
+          ? FloatingActionButton(
+              onPressed: () {
+                AppConfig().Bottom(
+                    context,
+                    "Adicionar",
+                    Container(
+                      child: Column(
+                        children: [
+                          ToPage(page: AddProject(), pageLabel: "Projeto"),
+                          ToPage(page: AddMaterial(), pageLabel: "Material")
+                          
+                        ],
+                      ),
+                    ));
+              },
+              backgroundColor: AppConfig().primaryColor,
+              child: Icon(Icons.add),
+            )
+          : null,
       body: Container(
-        
         child: Column(
           children: [
-              pages[selectedIndex],
+            pages[selectedIndex],
           ],
         ),
       ),
       bottomNavigationBar: Container(
         width: double.infinity,
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(AppConfig().radius),),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppConfig().radius),
+        ),
         child: ClipRRect(
           child: BottomNavigationBar(
             selectedItemColor: Colors.white,

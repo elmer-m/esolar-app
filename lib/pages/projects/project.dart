@@ -22,7 +22,9 @@ class _ProjectState extends State<Project> {
   List<dynamic> dataProject = [];
   bool haveVisits = false;
   bool showVisitLoding = false;
+  List<List<String>> materialsUsed = [];
   var visits;
+  double budget = 0.0;
 
   List<List<int>> Attachments = [];
   void ProcessFile(List<String> fileEncoded) {
@@ -100,18 +102,45 @@ class _ProjectState extends State<Project> {
     final body = jsonEncode({
       'id': widget.id,
     });
+
     try {
       final response = await http.post(url, headers: headers, body: body);
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
+
         setState(() {
           visits = data['data'];
+          List<String> prices = [];
+          var material;
+          print("Visits $visits");
+          visits.forEach((visit) {
+            material = jsonDecode(visit['MATERIALS']);
+            material.forEach((mat) {
+              print("Material $mat");
+              List<String> temp = [];
+              temp.add(mat[0]);
+              temp.add(mat[1]);
+              temp.add(mat[2]);
+              temp.add(mat[3]);
+              materialsUsed.add(temp);
+              prices.add(
+                  (double.parse(mat[3]) * double.parse(mat[2])).toString());
+            });
+          });
+          budget = 0.0;
+          prices.forEach((price) {
+            budget += double.parse(price);
+          });
+
+          print("Materiais $materialsUsed");
+
           haveVisits = visits.isEmpty ? false : true;
           visits.isEmpty
               ? print("Não tem visitas $haveVisits")
-              : print("tem visitas $haveVisits");
+              : print("Tem visitas $haveVisits");
         });
-        print("Veio ate aq ${visits}");
+
+        print("Veio até aqui ${visits}");
       } else {
         print('Erro: ${response.statusCode}');
       }
@@ -160,29 +189,30 @@ class _ProjectState extends State<Project> {
                         ),
                       )
                     : Expanded(
-                        // Adicione o Expanded aqui
                         child: SingleChildScrollView(
                           child: Column(
-                            children: visits.map<Widget>((visit) {
-                              return Container(
-                                margin: EdgeInsets.only(top: 10),
-                                width: double.infinity,
-                                child: Button(
-                                  text: "Visita - ${visit['NAME']}",
-                                  func: () {
-                                    print("ID: ${visit['ID'].toString()}");
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ViewVisit(
-                                          id: visit['ID'].toString(),
+                            children: visits.map<Widget>(
+                              (visit) {
+                                return Container(
+                                  margin: EdgeInsets.only(top: 10),
+                                  width: double.infinity,
+                                  child: Button(
+                                    text: "Visita - ${visit['NAME']}",
+                                    func: () {
+                                      print("ID: ${visit['ID'].toString()}");
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ViewVisit(
+                                            id: visit['ID'].toString(),
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              );
-                            }).toList(),
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                            ).toList(),
                           ),
                         ),
                       ),
@@ -192,7 +222,7 @@ class _ProjectState extends State<Project> {
         );
       },
     );
-        setState(() {
+    setState(() {
       showVisitLoding = false;
     });
   }
@@ -239,6 +269,7 @@ class _ProjectState extends State<Project> {
   @override
   void initState() {
     super.initState();
+    GetVisits();
     GetProject();
   }
 
@@ -271,7 +302,9 @@ class _ProjectState extends State<Project> {
           ),
           child: Center(
             child: dataProject.isEmpty
-                ? const CircularProgressIndicator()
+                ? CircularProgressIndicator(
+                    color: AppConfig().primaryColor,
+                  )
                 : SingleChildScrollView(
                     child: Container(
                       padding: EdgeInsets.all(AppConfig().padidng),
@@ -297,10 +330,22 @@ class _ProjectState extends State<Project> {
                                 ),
                               ),
                             ),
-                            child: Text(
-                              dataProject[0]['CLIENT_NAME'].toString(),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 20),
+                            child: Row(
+                              children: [
+                                Text(
+                                  dataProject[0]['CLIENT_NAME'].toString(),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20),
+                                ),
+                                Spacer(),
+                                Text(
+                                  budget.toStringAsFixed(2) + '€',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20),
+                                ),
+                              ],
                             ),
                           ),
                           Container(
@@ -432,119 +477,143 @@ class _ProjectState extends State<Project> {
                             child: Button(
                               text: "Mostrar Anexos",
                               func: () {
-                                showModalBottomSheet(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return Column(
-                                        children: [
-                                          Container(
-                                            padding: const EdgeInsets.only(
-                                                top: 20, left: 20, right: 20),
-                                            margin: const EdgeInsets.only(
-                                                top: 10, bottom: 20),
-                                            width: double.infinity,
-                                            child: Text(
-                                              "Anexos",
-                                              style: TextStyle(
-                                                  color: AppConfig().textColorW,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 40),
+                                AppConfig().Bottom(
+                                  context,
+                                  'Anexos',
+                                  Column(
+                                    children: [
+                                      Attachments.isEmpty
+                                          ? Container(
+                                              child: Text("Sem imagem"),
+                                            )
+                                          : Container(
+                                              width: double.infinity,
+                                              child: Wrap(
+                                                alignment: WrapAlignment.center,
+                                                runAlignment:
+                                                    WrapAlignment.center,
+                                                crossAxisAlignment:
+                                                    WrapCrossAlignment.center,
+                                                spacing: 6,
+                                                children: Attachments.map(
+                                                  (fileBytes) {
+                                                    Uint8List uint8List =
+                                                        Uint8List.fromList(
+                                                            fileBytes);
+                                                    bool isPdf(
+                                                        List<int>
+                                                            fileBytesMeeter) {
+                                                      return fileBytes.length >=
+                                                              4 &&
+                                                          fileBytesMeeter[0] ==
+                                                              0x25 &&
+                                                          fileBytesMeeter[1] ==
+                                                              0x50 &&
+                                                          fileBytesMeeter[2] ==
+                                                              0x44 &&
+                                                          fileBytesMeeter[3] ==
+                                                              0x46;
+                                                    }
+
+                                                    return isPdf(fileBytes)
+                                                        ? Container(
+                                                            width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                0.2,
+                                                            height: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .height *
+                                                                0.16,
+                                                            child:
+                                                                GestureDetector(
+                                                              onTap: () =>
+                                                                  AttachmentFocus(
+                                                                      uint8List),
+                                                              child:
+                                                                  AbsorbPointer(
+                                                                child:
+                                                                    SfPdfViewer
+                                                                        .memory(
+                                                                  uint8List,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          )
+                                                        : Container(
+                                                            width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                0.2,
+                                                            height: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .height *
+                                                                0.2,
+                                                            child:
+                                                                GestureDetector(
+                                                              onTap: () =>
+                                                                  AttachmentFocus(
+                                                                      uint8List),
+                                                              child:
+                                                                  Image.memory(
+                                                                      uint8List),
+                                                            ),
+                                                          );
+                                                  },
+                                                ).toList(),
+                                              ),
+                                            ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.only(top: 10),
+                            width: double.infinity,
+                            child: Button(
+                              text: "Mostrar Materiais",
+                              func: () {
+                                AppConfig().Bottom(
+                                    context,
+                                    'Materiais',
+                                    Column(
+                                      children: materialsUsed.map((material) {
+                                        return Container(
+                                          width: double.infinity,
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 20),
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                              bottom: BorderSide(
+                                                  width: 0.2,
+                                                  color:
+                                                      AppConfig().textColorW),
                                             ),
                                           ),
-                                          Attachments.isEmpty
-                                              ? Container(
-                                                  child: Text("Sem imagem"),
-                                                )
-                                              : Container(
-                                                  width: double.infinity,
-                                                  child: Wrap(
-                                                    alignment:
-                                                        WrapAlignment.center,
-                                                    runAlignment:
-                                                        WrapAlignment.center,
-                                                    crossAxisAlignment:
-                                                        WrapCrossAlignment
-                                                            .center,
-                                                    spacing: 6,
-                                                    children: Attachments.map(
-                                                      (fileBytes) {
-                                                        Uint8List uint8List =
-                                                            Uint8List.fromList(
-                                                                fileBytes);
-                                                        bool isPdf(
-                                                            List<int>
-                                                                fileBytesMeeter) {
-                                                          return fileBytes
-                                                                      .length >=
-                                                                  4 &&
-                                                              fileBytesMeeter[
-                                                                      0] ==
-                                                                  0x25 &&
-                                                              fileBytesMeeter[
-                                                                      1] ==
-                                                                  0x50 &&
-                                                              fileBytesMeeter[
-                                                                      2] ==
-                                                                  0x44 &&
-                                                              fileBytesMeeter[
-                                                                      3] ==
-                                                                  0x46;
-                                                        }
-
-                                                        return isPdf(fileBytes)
-                                                            ? Container(
-                                                                width: MediaQuery.of(
-                                                                            context)
-                                                                        .size
-                                                                        .width *
-                                                                    0.2,
-                                                                height: MediaQuery.of(
-                                                                            context)
-                                                                        .size
-                                                                        .height *
-                                                                    0.16,
-                                                                child:
-                                                                    GestureDetector(
-                                                                  onTap: () =>
-                                                                      AttachmentFocus(
-                                                                          uint8List),
-                                                                  child:
-                                                                      AbsorbPointer(
-                                                                    child: SfPdfViewer
-                                                                        .memory(
-                                                                      uint8List,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              )
-                                                            : Container(
-                                                                width: MediaQuery.of(
-                                                                            context)
-                                                                        .size
-                                                                        .width *
-                                                                    0.2,
-                                                                height: MediaQuery.of(
-                                                                            context)
-                                                                        .size
-                                                                        .height *
-                                                                    0.2,
-                                                                child:
-                                                                    GestureDetector(
-                                                                  onTap: () =>
-                                                                      AttachmentFocus(
-                                                                          uint8List),
-                                                                  child: Image
-                                                                      .memory(
-                                                                          uint8List),
-                                                                ),
-                                                              );
-                                                      },
-                                                    ).toList(),
-                                                  ),
-                                                ),
-                                        ],
-                                      );
-                                    });
+                                          child: Row(
+                                            children: [
+                                              Text(material[1]),
+                                              Spacer(),
+                                              Text(material[2]),
+                                              Text(' - '),
+                                              Text(
+                                                ((double.parse(material[3]) *
+                                                        double.parse(
+                                                            material[2]))
+                                                    .toStringAsFixed(2)),
+                                              ),
+                                              Text('€')
+                                            ],
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ));
                               },
                             ),
                           ),
