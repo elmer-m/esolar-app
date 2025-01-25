@@ -13,22 +13,27 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:eslar/components/AppConfig.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
-class AddProject extends StatefulWidget {
-  const AddProject({super.key});
+class EditProject extends StatefulWidget {
+  String id = "";
+  EditProject({super.key, required this.id});
 
   @override
-  State<AddProject> createState() => _AddProjectState();
+  State<EditProject> createState() => _EditProjectState();
 }
 
-class _AddProjectState extends State<AddProject> {
+class _EditProjectState extends State<EditProject> {
   TextEditingController client_name = TextEditingController();
   TextEditingController client_number = TextEditingController();
   TextEditingController client_number_code = TextEditingController();
   TextEditingController date = TextEditingController();
   TextEditingController address = TextEditingController();
+  List<dynamic> dataProject = [];
+  final GlobalKey<DropdownState> localKey = GlobalKey<DropdownState>();
+  final GlobalKey<DropdownState> goalKey = GlobalKey<DropdownState>();
+  final GlobalKey<DropdownState> stateKey = GlobalKey<DropdownState>();
+  final GlobalKey<DropdownState> colKey = GlobalKey<DropdownState>();
 
   String phone_code = "";
   String location = "";
@@ -40,6 +45,7 @@ class _AddProjectState extends State<AddProject> {
   List<String> optionsStatus = [];
   List<List<String>> collaborators = [];
   List<String> collaboratorsChosed = [];
+  List<String> collaboratorsChosedEdit = [];
 
   DateTime? selectedDate;
 
@@ -152,7 +158,7 @@ class _AddProjectState extends State<AddProject> {
               actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Fecha o dialog
+                    Navigator.of(context).pop();
                   },
                   child: const Text("Fechar"),
                 ),
@@ -164,6 +170,7 @@ class _AddProjectState extends State<AddProject> {
 
   bool uploading = false;
   List<String> locations = ['teste'];
+
   Future<void> getLocations() async {
     final url = Uri.parse('https://tze.ddns.net:8108/getLocations.php');
     final response = await http.get(url);
@@ -180,6 +187,73 @@ class _AddProjectState extends State<AddProject> {
       }
     } else {
       print("Erro ao fazer a requisição. Status: ${response.statusCode}");
+    }
+  }
+
+  List<List<int>> Attachments = [];
+  void ProcessFile(List<String> fileEncoded) {
+    try {
+      fileEncoded.forEach(
+        (item) {
+          List<int> bytes = base64Decode(item);
+          setState(
+            () {
+              Attachments.add(bytes);
+            },
+          );
+        },
+      );
+    } catch (e) {
+      print("Erro: $e");
+    }
+  }
+
+  List<String> uploadedFiles = [];
+  Future<void> GetProject() async {
+    final url = Uri.parse('https://tze.ddns.net:8108/getProject.php');
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({
+      'id': widget.id,
+    });
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        setState(() {
+          dataProject = [data['data']];
+        });
+        print('Data ${dataProject[0]}');
+        client_name.text = dataProject[0]['CLIENT_NAME'];
+        client_number_code.text = dataProject[0]['PHONE_CODE'].toString();
+        client_number.text = dataProject[0]['PHONE'].toString();
+        address.text = dataProject[0]['ADDRESS'];
+        goalKey.currentState?.setValue(dataProject[0]['GOAL']);
+        stateKey.currentState?.setValue(dataProject[0]['STATUS']);
+        localKey.currentState?.setValue(dataProject[0]['LOCATION']);
+        setState(() {
+          var collaboratorsArm =
+              List<String>.from(jsonDecode(dataProject[0]['COLLABORATORS']));
+          collaboratorsChosedEdit = collaborators
+              .where((col) => collaboratorsArm.contains(col[0]))
+              .map((col) => col[1])
+              .toList();
+          collaboratorsChosed = collaborators
+              .where((col) => collaboratorsArm.contains(col[0]))
+              .map((col) => col[0])
+              .toList();
+          date.text = dataProject[0]['DATE_PROJECT'];
+          print("Data Project" + date.text);
+        });
+        uploadedFiles =
+            List<String>.from(jsonDecode(data['data']['UPLOADED_FILES']));
+        files = uploadedFiles;
+        ProcessFile(uploadedFiles);
+        loading = false;
+      } else {
+        print('Erro: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erro na requisição: $e');
     }
   }
 
@@ -247,14 +321,14 @@ class _AddProjectState extends State<AddProject> {
     }
   }
 
-  Future<void> Create() async {
-    final url = Uri.parse('https://tze.ddns.net:8108/newProject.php');
-
+  Future<void> Edit() async {
+    final url = Uri.parse('https://tze.ddns.net:8108/editProject.php');
     try {
       setState(() {
         uploading = true;
       });
       var request = http.MultipartRequest('POST', url);
+      request.fields['id'] = widget.id;
       request.fields['client_name'] =
           client_name.text.isNotEmpty ? client_name.text : 'N/A';
       request.fields['phone_code'] =
@@ -267,10 +341,8 @@ class _AddProjectState extends State<AddProject> {
       request.fields['goal'] = goal.isNotEmpty ? goal : 'N/A';
       request.fields['status'] = status.isNotEmpty ? status : 'N/A';
       request.fields['date'] = date.text;
-      request.fields['userName'] = userName.isNotEmpty ? userName : 'N/A';
       request.fields['collaborators'] = jsonEncode(collaboratorsChosed);
-      request.fields['files'] = jsonEncode(files);
-      print("JsonEncoded " + jsonEncode(files));
+      request.fields['uploaded_files'] = jsonEncode(files);
 
       var streamResponse = await request.send();
 
@@ -278,8 +350,7 @@ class _AddProjectState extends State<AddProject> {
       if (response.statusCode == 200) {
         print("Deu certo:  ${response.body}");
         var dataa = jsonDecode(response.body);
-        Navigator.pop(context);
-        Navigator.pop(context);
+        Navigator.pop(context, '.');
       } else {
         print("Deu errado, erro: ${response.statusCode}");
         print("Resposta: ${response.body}");
@@ -295,25 +366,19 @@ class _AddProjectState extends State<AddProject> {
     }
   }
 
-  String userName = "";
-  Future<void> loadUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final user = prefs.getStringList('userData');
-
-    setState(() {
-      userName = "${user![0]} ${user[1]}";
-      print("User Name: $userName");
-    });
-  }
-
+  bool loading = true;
   @override
   void initState() {
+    super.initState();
+    initializeData();
+  }
+
+  Future<void> initializeData() async {
     getLocations();
     getGoals();
     getStatus();
-    getUsers();
-    loadUser();
-    super.initState();
+    await getUsers();
+    await GetProject();
   }
 
   @override
@@ -321,9 +386,19 @@ class _AddProjectState extends State<AddProject> {
     return Scaffold(
       backgroundColor: AppConfig().overlayColor,
       appBar: AppBar(
-        shadowColor: Colors.transparent,
         backgroundColor: Colors.transparent,
-        iconTheme: IconThemeData(color: AppConfig().primaryColor),
+        shadowColor: Colors.transparent,
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppConfig().backgroundColor,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: IconButton(
+            icon: Icon(Icons.arrow_back, color: AppConfig().primaryColor),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ),
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -352,7 +427,7 @@ class _AddProjectState extends State<AddProject> {
                             margin: const EdgeInsets.only(top: 10, bottom: 20),
                             child: Center(
                               child: Text(
-                                "Adicionar Projeto",
+                                "Editar Projeto",
                                 style: TextStyle(
                                     fontSize: 25, fontWeight: FontWeight.w600),
                               ),
@@ -373,7 +448,7 @@ class _AddProjectState extends State<AddProject> {
                                   flex: 3,
                                   child: Container(
                                     child: Input(
-                                      label: "Código de País",
+                                      label: "+351",
                                       controler: client_number_code,
                                       type: TextInputType.numberWithOptions(),
                                     ),
@@ -399,15 +474,15 @@ class _AddProjectState extends State<AddProject> {
                                 label: "Endereço completo", controler: address),
                           ),
                           Dropdown(
+                            key: localKey,
                             data: locations,
                             label: "Local",
-                            search: true,
                             onChanged: (value) {
                               location = value;
-                              print("object $location");
                             },
                           ),
                           Dropdown(
+                            key: goalKey,
                             data: optionsGoal,
                             label: "Objetivo",
                             onChanged: (value) {
@@ -415,6 +490,7 @@ class _AddProjectState extends State<AddProject> {
                             },
                           ),
                           Dropdown(
+                            key: stateKey,
                             data: optionsStatus,
                             label: "Estado",
                             onChanged: (value) {
@@ -424,6 +500,7 @@ class _AddProjectState extends State<AddProject> {
                           Container(
                             margin: const EdgeInsets.symmetric(vertical: 5),
                             child: DropdownSearch<String>.multiSelection(
+                              key: colKey,
                               onChanged: (selectedNames) {
                                 print("$selectedNames $collaborators");
                                 setState(() {
@@ -445,6 +522,7 @@ class _AddProjectState extends State<AddProject> {
                               items: (filter, infiniteScrollProps) async {
                                 return collaborators.map((e) => e[1]).toList();
                               },
+                              selectedItems: collaboratorsChosedEdit,
                               suffixProps: DropdownSuffixProps(
                                 dropdownButtonProps: DropdownButtonProps(
                                   iconClosed: Icon(Icons.keyboard_arrow_down),
@@ -511,151 +589,35 @@ class _AddProjectState extends State<AddProject> {
                               type: TextInputType.datetime,
                             ),
                           ),
-                          SeeFiles(
-                            files: files,
-                            addMore: true,
-                            onChanged: (value) {
-                              files = value;
-                            },
+                          Container(
+                            margin: EdgeInsets.only(top: 10),
+                            child: Text(
+                              "Anexos",
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w300,
+                                color: Color.fromARGB(255, 99, 99, 99),
+                              ),
+                            ),
                           ),
-                          //   width: double.infinity
-                          //   margin: EdgeInsets.symmetric(vertical: 10),
-                          //   child: Column(
-                          //     children: [
-                          //       Container(
-                          //         margin: EdgeInsets.symmetric(vertical: 10),
-                          //         child: Text(
-                          //           "Funcionários",
-                          //           style: TextStyle(
-                          //               fontSize: 18, fontWeight: FontWeight.w500),
-                          //         ),
-                          //       ),
-                          //       Wrap(
-                          //         spacing: 3,
-                          //         runSpacing: 3,
-                          //         alignment: WrapAlignment.center,
-                          //         children: [
-                          //           Container(
-                          //             padding: EdgeInsets.symmetric(
-                          //                 horizontal: 8, vertical: 5),
-                          //             decoration: BoxDecoration(
-                          //               borderRadius:
-                          //                   BorderRadius.circular(AppConfig().radius),
-                          //               color: AppConfig().primaryColor,
-                          //             ),
-                          //             child: Text(
-                          //               "João Costa",
-                          //               style: TextStyle(
-                          //                 fontWeight: FontWeight.w500,
-                          //                 color: Colors.white,
-                          //               ),
-                          //             ),
-                          //           ),
-                          //           Container(
-                          //             padding: EdgeInsets.symmetric(
-                          //                 horizontal: 8, vertical: 5),
-                          //             decoration: BoxDecoration(
-                          //               borderRadius:
-                          //                   BorderRadius.circular(AppConfig().radius),
-                          //               color: AppConfig().primaryColor,
-                          //             ),
-                          //             child: Text(
-                          //               "Maria Silva",
-                          //               style: TextStyle(
-                          //                 fontWeight: FontWeight.w500,
-                          //                 color: Colors.white,
-                          //               ),
-                          //             ),
-                          //           ),
-                          //           Container(
-                          //             padding: EdgeInsets.symmetric(
-                          //                 horizontal: 8, vertical: 5),
-                          //             decoration: BoxDecoration(
-                          //               borderRadius:
-                          //                   BorderRadius.circular(AppConfig().radius),
-                          //               color: AppConfig().primaryColor,
-                          //             ),
-                          //             child: Text(
-                          //               "Carlos Santos",
-                          //               style: TextStyle(
-                          //                 fontWeight: FontWeight.w500,
-                          //                 color: Colors.white,
-                          //               ),
-                          //             ),
-                          //           ),
-                          //           Container(
-                          //             padding: EdgeInsets.symmetric(
-                          //                 horizontal: 8, vertical: 5),
-                          //             decoration: BoxDecoration(
-                          //               borderRadius:
-                          //                   BorderRadius.circular(AppConfig().radius),
-                          //               color: AppConfig().primaryColor,
-                          //             ),
-                          //             child: Text(
-                          //               "Ana Oliveira",
-                          //               style: TextStyle(
-                          //                 fontWeight: FontWeight.w500,
-                          //                 color: Colors.white,
-                          //               ),
-                          //             ),
-                          //           ),
-                          //           Container(
-                          //             padding: EdgeInsets.symmetric(
-                          //                 horizontal: 8, vertical: 5),
-                          //             decoration: BoxDecoration(
-                          //               borderRadius:
-                          //                   BorderRadius.circular(AppConfig().radius),
-                          //               color: AppConfig().primaryColor,
-                          //             ),
-                          //             child: Text(
-                          //               "Pedro Lima",
-                          //               style: TextStyle(
-                          //                 fontWeight: FontWeight.w500,
-                          //                 color: Colors.white,
-                          //               ),
-                          //             ),
-                          //           ),
-                          //           Container(
-                          //             padding: EdgeInsets.symmetric(
-                          //                 horizontal: 8, vertical: 5),
-                          //             decoration: BoxDecoration(
-                          //               borderRadius:
-                          //                   BorderRadius.circular(AppConfig().radius),
-                          //               color: AppConfig().primaryColor,
-                          //             ),
-                          //             child: Text(
-                          //               "Rafael Ferreira",
-                          //               style: TextStyle(
-                          //                 fontWeight: FontWeight.w500,
-                          //                 color: Colors.white,
-                          //               ),
-                          //             ),
-                          //           ),
-                          //           Container(
-                          //             padding: EdgeInsets.symmetric(
-                          //                 horizontal: 5, vertical: 5),
-                          //             decoration: BoxDecoration(
-                          //               borderRadius:
-                          //                   BorderRadius.circular(AppConfig().radius),
-                          //               color: AppConfig().primaryColor,
-                          //             ),
-                          //             child: Icon(
-                          //               Icons.add,
-                          //               color: Colors.white,
-                          //             ),
-                          //           ),
-                          //         ],
-                          //       ),
-                          //     ],
-                          //   ),
-                          // ),
+                          Container(
+                            margin: EdgeInsets.only(top: 5, bottom: 10),
+                            child: SeeFiles(
+                              addMore: true,
+                              files: uploadedFiles,
+                              forRemove: true,
+                              onChanged: (value) {
+                                files = value;
+                              },
+                            ),
+                          ),
                           Container(
                             margin: const EdgeInsets.only(top: 20),
                             width: double.infinity,
                             child: Button(
                               loading: uploading,
-                              text: "Adicionar",
-                              func: () => Create(),
+                              text: "Editar",
+                              func: () => Edit(),
                             ),
                           ),
                         ],

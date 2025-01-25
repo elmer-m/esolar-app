@@ -13,50 +13,58 @@ class _ConfigState extends State<Config> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppConfig().overlayColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
         iconTheme: IconThemeData(color: AppConfig().primaryColor),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        child: Container(
-          padding: EdgeInsets.all(AppConfig().radius),
+      body: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: AppConfig().backgroundColor,
-            borderRadius: BorderRadius.circular(AppConfig().radius),
-          ),
-          child: Column(
-            children: [
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 40),
-                child: const Text(
-                  textAlign: TextAlign.start,
-                  "Configuração",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+              borderRadius: BorderRadius.circular(AppConfig().radius),
+              color: AppConfig().overlayColor),
+          child: Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 0),
+                child: Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 30),
+                      width: double.infinity,
+                      child: Text(
+                        "Definições",
+                        style: TextStyle(
+                            color: AppConfig().textColorW,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 40),
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(AppConfig().radius),
+                          topRight: Radius.circular(AppConfig().radius),
+                          bottomLeft: Radius.circular(AppConfig().radius),
+                          bottomRight: Radius.circular(AppConfig().radius),
+                        ),
+                        color: Colors.white,
+                      ),
+                      child: Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                         decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(AppConfig().radius),
-                          color: Colors.white,
+                          
                         ),
                         child: Row(
                           children: [
-                            const Text("Notificações"),
-                            const Spacer(),
+                            Text(
+                              "Notificações",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500, fontSize: 15),
+                            ),
+                            Spacer(),
                             Switch(
                               value: first,
                               activeColor: AppConfig().primaryColor,
@@ -69,189 +77,12 @@ class _ConfigState extends State<Config> {
                           ],
                         ),
                       ),
-
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(AppConfig().radius),
-                          color: Colors.white,
-                        ),
-                        child: Row(
-                          children: [
-                            const Text("Config"),
-                            const Spacer(),
-                            Switch(
-                                value: false,
-                                activeColor: AppConfig().primaryColor,
-                                onChanged: (value) {}),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(AppConfig().radius),
-                          color: Colors.white,
-                        ),
-                        child: Row(
-                          children: [
-                            const Text("Notificações"),
-                            const Spacer(),
-                            Switch(
-                                value: false,
-                                activeColor: AppConfig().primaryColor,
-                                onChanged: (value) {}),
-                          ],
-                        ),
-                      ),
-
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(AppConfig().radius),
-                          color: Colors.white,
-                        ),
-                        child: Row(
-                          children: [
-                            const Text("Config"),
-                            const Spacer(),
-                            Switch(
-                                value: false,
-                                activeColor: AppConfig().primaryColor,
-                                onChanged: (value) {}),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(AppConfig().radius),
-                          color: Colors.white,
-                        ),
-                        child: Row(
-                          children: [
-                            const Text("Notificações"),
-                            const Spacer(),
-                            Switch(
-                                value: false,
-                                activeColor: AppConfig().primaryColor,
-                                onChanged: (value) {}),
-                          ],
-                        ),
-                      ),
-
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(AppConfig().radius),
-                          color: Colors.white,
-                        ),
-                        child: Row(
-                          children: [
-                            const Text("Config"),
-                            const Spacer(),
-                            Switch(
-                                value: false,
-                                activeColor: AppConfig().primaryColor,
-                                onChanged: (value) {}),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(AppConfig().radius),
-                          color: Colors.white,
-                        ),
-                        child: Row(
-                          children: [
-                            const Text("Notificações"),
-                            const Spacer(),
-                            Switch(
-                                value: false,
-                                activeColor: AppConfig().primaryColor,
-                                onChanged: (value) {}),
-                          ],
-                        ),
-                      ),
-
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(AppConfig().radius),
-                          color: Colors.white,
-                        ),
-                        child: Row(
-                          children: [
-                            const Text("Config"),
-                            const Spacer(),
-                            Switch(
-                                value: false,
-                                activeColor: AppConfig().primaryColor,
-                                onChanged: (value) {}),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(AppConfig().radius),
-                          color: Colors.white,
-                        ),
-                        child: Row(
-                          children: [
-                            const Text("Config"),
-                            const Spacer(),
-                            Switch(
-                                value: false,
-                                activeColor: AppConfig().primaryColor,
-                                onChanged: (value) {}),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(AppConfig().radius),
-                          color: Colors.white,
-                        ),
-                        child: Row(
-                          children: [
-                            const Text("Config"),
-                            const Spacer(),
-                            Switch(
-                                value: false,
-                                activeColor: AppConfig().primaryColor,
-                                onChanged: (value) {}),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              )
-            ],
-          ),
-        ),
-      ),
+              ),
+            ),
+          )),
     );
   }
 }

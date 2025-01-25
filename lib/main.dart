@@ -1,32 +1,31 @@
 import 'package:eslar/pages/auth/register.dart';
+import 'package:eslar/pages/dashboard.dart';
 import 'package:eslar/pages/projects/addProject.dart';
 import 'package:flutter/material.dart';
 import 'package:eslar/pages/auth/login.dart';
 import 'package:eslar/pages/projects/startVisit.dart';
 import 'package:eslar/components/button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 void main() {
   runApp(const MyApp());
 }
-class MyApp extends StatelessWidget {
+
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
-  // This widget is the root of your application.
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: false,
       ),
@@ -34,6 +33,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
   // This widget is the home page of your application. It is stateful, meaning
@@ -51,6 +51,27 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+    Future<void> loadUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final user = await prefs.getStringList('userData');
+
+    print(user);
+    if (user != null) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const Dashboard(),
+        ),
+        (Route<dynamic> route) => false,
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadUser();
+  }
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done

@@ -7,12 +7,14 @@ class Input extends StatelessWidget {
   final TextEditingController controler;
   final TextInputType type;
   final bool onlyRead;
+  final bool hiddeChar;
   final VoidCallback? function;
 
-  const Input({super.key, required this.label, required this.controler, this.type = TextInputType.text, this.onlyRead = false, this.function});
+  const Input({super.key, required this.label, required this.controler, this.type = TextInputType.text, this.onlyRead = false, this.function, this.hiddeChar = false});
   @override
   Widget build(BuildContext context) {
     return TextField(
+      obscureText: hiddeChar,
       onTap: function,
       readOnly: onlyRead,
       controller: controler,

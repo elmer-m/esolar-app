@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:eslar/pages/auth/register.dart';
 import 'package:eslar/pages/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:eslar/components/input.dart';
@@ -88,6 +89,7 @@ class _LoginState extends State<Login> {
     List<String> userInfo = [];
     userInfo.add(userData['firstName']);
     userInfo.add(userData['lastName']);
+    userInfo.add(userData['email']);
     await prefs.setStringList('userData', userInfo);
     print("Salvo");
   }
@@ -95,107 +97,131 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          shadowColor: Colors.transparent,
-          backgroundColor: AppConfig().overlayColor,
-          iconTheme: IconThemeData(color: AppConfig().primaryColor),
-        ),
         body: Container(
-          color: AppConfig().overlayColor,
+      color: AppConfig().overlayColor,
+      child: Center(
+        child: SingleChildScrollView(
           child: Center(
-            child: SingleChildScrollView(
-              child: Center(
-                  child: Container(
-                width: MediaQuery.of(context).size.width * (10 / 12),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                decoration: BoxDecoration(
-                  color: AppConfig().backgroundColor,
-                  borderRadius: BorderRadius.circular(AppConfig().radius),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      child: Center(
-                        child: Image.asset('assets/images/logo.png'),
-                      ),
+            child: Container(
+              width: MediaQuery.of(context).size.width * (10 / 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              decoration: BoxDecoration(
+                color: AppConfig().backgroundColor,
+                borderRadius: BorderRadius.circular(AppConfig().radius),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    child: Center(
+                      child: Image.asset('assets/images/logo.png'),
                     ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 60),
-                      child: Column(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(top: 20),
-                            child: Input(
-                              label: "Email",
-                              controler: emailController,
-                              type: TextInputType.emailAddress,
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(top: 60),
+                    child: Column(
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.only(top: 20),
+                          child: Input(
+                            label: "Email",
+                            controler: emailController,
+                            type: TextInputType.emailAddress,
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.only(top: 20, bottom: 10),
+                          child: Input(
+                              hiddeChar: true,
+                              label: "Palavra-Passe",
+                              controler: passwordController),
+                        ),
+                        Visibility(
+                          visible: invalidData,
+                          child: Container(
+                            margin: const EdgeInsets.only(
+                              bottom: 10,
+                            ),
+                            child: Center(
+                              child: Text(
+                                errorText,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.red),
+                              ),
                             ),
                           ),
-                          Container(
-                            margin: const EdgeInsets.only(top: 20, bottom: 10),
-                            child: Input(
-                                label: "Palavra-Passe",
-                                controler: passwordController),
-                          ),
-                          Visibility(
-                            visible: invalidData,
-                            child: Container(
-                              margin: const EdgeInsets.only(
-                                bottom: 10,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  errorText,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.red),
-                                ),
+                        ),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 45,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(
+                                () {
+                                  Loading = true;
+                                  Entrar();
+                                },
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromRGBO(255, 93, 7, 1),
+                              padding: const EdgeInsets.symmetric(vertical: 15),
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(AppConfig().radius),
                               ),
                             ),
+                            child: Loading
+                                ? FittedBox(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 3,
+                                    ),
+                                  )
+                                : Text("Entrar"),
                           ),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 45,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                setState(
-                                  () {
-                                    Loading = true;
-                                    Entrar();
-                                  },
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    const Color.fromRGBO(255, 93, 7, 1),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 15),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(AppConfig().radius),
-                                ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(top: 15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Ainda não tem uma conta?",
+                                style: TextStyle(),
                               ),
-                              child: Loading
-                                  ? FittedBox(
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 3,
+                              TextButton(
+                                isSemanticButton: false,
+                                onPressed: () {
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => Register(),
                                       ),
-                                    )
-                                  : Text("Entrar"),
-                            ),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              )),
+                                      (Route<dynamic> route) => false);
+                                },
+                                child: Text(
+                                  "Registar",
+                                  style: TextStyle(
+                                      color: AppConfig().primaryColor,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              )
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
-        ));
+        ),
+      ),
+    ));
   }
 }

@@ -27,7 +27,7 @@ class _ButtonState extends State<Button> {
   Widget build(BuildContext context) {
     return widget.outlined
         ? SizedBox(
-            height: 45,
+            height: 50,
             child: OutlinedButton(
               onPressed: widget.func,
               style: OutlinedButton.styleFrom(
@@ -58,7 +58,7 @@ class _ButtonState extends State<Button> {
             ),
           )
         : SizedBox(
-            height: 45,
+            height: 50,
             child: ElevatedButton(
               onPressed: widget.func,
               style: ElevatedButton.styleFrom(

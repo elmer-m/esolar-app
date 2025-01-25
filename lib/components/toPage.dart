@@ -18,12 +18,11 @@ class ToPage extends StatelessWidget {
         );
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        margin: const EdgeInsets.symmetric(vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         width: double.infinity,
         decoration: BoxDecoration(
-          color: AppConfig().primaryColor,
-          borderRadius: BorderRadius.circular(AppConfig().radius),
+          color: Colors.white,
+          border: Border(bottom: BorderSide(color: AppConfig().textColorW, width: 0.2),),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,8 +32,8 @@ class ToPage extends StatelessWidget {
                 Container(
                   child: Text(
                     pageLabel,
-                    style: const TextStyle(
-                        color: Colors.white,
+                    style: TextStyle(
+                        color: AppConfig().textColorW,
                         fontSize: 18,
                         fontWeight: FontWeight.w500),
                   ),
@@ -52,3 +51,24 @@ class ToPage extends StatelessWidget {
     );
   }
 }
+
+// class PageList extends StatelessWidget {
+//   final List<ToPage> pages;
+
+//   const PageList({super.key, required this.pages});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return ListView.builder(
+//       itemCount: pages.length,
+//       itemBuilder: (context, index) {
+//         return ToPage(
+//           page: pages[index],
+//           pageLabel: pages[index].pageLabel,
+//           isFirst: index == 0,
+//           isLast: index == pages.length - 1,
+//         );
+//       },
+//     );
+//   }
+// }

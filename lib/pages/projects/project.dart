@@ -2,6 +2,7 @@
 
 import 'dart:typed_data';
 import 'package:eslar/components/button.dart';
+import 'package:eslar/pages/projects/editProject.dart';
 import 'package:eslar/pages/projects/startVisit.dart';
 import 'package:eslar/pages/projects/viewVisit.dart';
 import 'package:flutter/material.dart';
@@ -113,6 +114,7 @@ class _ProjectState extends State<Project> {
           List<String> prices = [];
           var material;
           print("Visits $visits");
+          materialsUsed.clear();
           visits.forEach((visit) {
             material = jsonDecode(visit['MATERIALS']);
             material.forEach((mat) {
@@ -154,73 +156,45 @@ class _ProjectState extends State<Project> {
       showVisitLoding = true;
     });
     await GetVisits();
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-          margin: const EdgeInsets.only(top: 10, bottom: 20),
-          width: double.infinity,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Ver Visita",
-                style: TextStyle(
-                  color: AppConfig().textColorW,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 40,
+    AppConfig().Bottom(
+      context,
+      "Ver Visitas",
+      Center(
+        child: visits.isEmpty && !haveVisits
+            ? Container(
+                margin: EdgeInsets.symmetric(vertical: 20),
+                child: Center(
+                  child: Text(
+                    "Não há visitas neste projeto.",
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      color: Color.fromARGB(255, 99, 99, 99),
+                    ),
+                  ),
+                ),
+              )
+            : Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: visits.map<Widget>(
+                      (visit) {
+                        return Container(
+                          margin: EdgeInsets.only(top: 10),
+                          width: double.infinity,
+                          child: Button(
+                            text: "Visita - ${visit['NAME']}",
+                            func: () {
+                              ViewVisitId(visit['ID'].toString());
+                            },
+                          ),
+                        );
+                      },
+                    ).toList(),
+                  ),
                 ),
               ),
-              Center(
-                child: visits.isEmpty && !haveVisits
-                    ? Container(
-                        margin: EdgeInsets.symmetric(vertical: 20),
-                        child: Center(
-                          child: Text(
-                            "Não há visitas neste projeto.",
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400,
-                              color: Color.fromARGB(255, 99, 99, 99),
-                            ),
-                          ),
-                        ),
-                      )
-                    : Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: visits.map<Widget>(
-                              (visit) {
-                                return Container(
-                                  margin: EdgeInsets.only(top: 10),
-                                  width: double.infinity,
-                                  child: Button(
-                                    text: "Visita - ${visit['NAME']}",
-                                    func: () {
-                                      print("ID: ${visit['ID'].toString()}");
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ViewVisit(
-                                            id: visit['ID'].toString(),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                );
-                              },
-                            ).toList(),
-                          ),
-                        ),
-                      ),
-              ),
-            ],
-          ),
-        );
-      },
+      ),
     );
     setState(() {
       showVisitLoding = false;
@@ -242,9 +216,25 @@ class _ProjectState extends State<Project> {
     }
   }
 
+  Future<void> ViewVisitId(id) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ViewVisit(
+          id: id,
+        ),
+      ),
+    );
+
+    if (result != null) {
+      Navigator.pop(context);
+    }
+  }
+
   Future<void> GetProject() async {
     final url = Uri.parse('https://tze.ddns.net:8108/getProject.php');
     final headers = {'Content-Type': 'application/json'};
+    Attachments = [];
     final body = jsonEncode({
       'id': widget.id,
     });
@@ -255,14 +245,89 @@ class _ProjectState extends State<Project> {
         setState(() {
           dataProject = [data['data']];
         });
+        print("Não esta acessando");
         List<String> uploadedFiles =
             List<String>.from(jsonDecode(data['data']['UPLOADED_FILES']));
+        if (data['data']['ARCHIVED'] == 0) {
+          archived = 1;
+        } else {
+          archived = 0;
+        }
+        print("Valor do archived $archived");
         ProcessFile(uploadedFiles);
       } else {
         print('Erro: ${response.statusCode}');
       }
     } catch (e) {
       print('Erro na requisição: $e');
+    }
+  }
+
+  Future<void> DeleteProject() async {
+    final url = Uri.parse('https://tze.ddns.net:8108/deleteProject.php');
+    var request = http.MultipartRequest('POST', url);
+    request.fields['id'] = widget.id;
+    var streamResponse = await request.send();
+
+    final response = await http.Response.fromStream(streamResponse);
+    try {
+      print("Aqui");
+
+      if (response.statusCode == 200) {
+        print("Deu certo ${widget.id} ${response.body}");
+        Navigator.pop(context);
+        Navigator.pop(context, 'project');
+      } else {
+        print('Erro: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erro na requisição: $e');
+    }
+  }
+
+  int archived = 1;
+  Future<void> ArchiveProject() async {
+    final url = Uri.parse('https://tze.ddns.net:8108/archiveProject.php');
+    var request = http.MultipartRequest('POST', url);
+    request.fields['id'] = widget.id;
+    request.fields['archived'] = archived.toString();
+    var streamResponse = await request.send();
+
+    final response = await http.Response.fromStream(streamResponse);
+    try {
+      print("Aqui");
+
+      if (response.statusCode == 200) {
+        setState(() {
+          if (archived == 0) {
+            archived = 1;
+          } else {
+            archived = 0;
+          }
+        });
+        print("Valor do archived depois de salvar $archived ${response.body}");
+      } else {
+        print('Erro: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erro na requisição: $e');
+    }
+  }
+
+  Future<void> Edit() async {
+    var id = dataProject[0]['ID'].toString();
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProject(
+          id: id,
+        ),
+      ),
+    );
+
+    if (result != null) {
+      GetVisits();
+      GetProject();
     }
   }
 
@@ -332,11 +397,16 @@ class _ProjectState extends State<Project> {
                             ),
                             child: Row(
                               children: [
-                                Text(
-                                  dataProject[0]['CLIENT_NAME'].toString(),
-                                  style: const TextStyle(
+                                Expanded(
+                                  child: Text(
+                                    dataProject[0]['CLIENT_NAME'].toString(),
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 20),
+                                      fontSize: 20,
+                                    ),
+                                    overflow: TextOverflow.visible,
+                                    softWrap: true,
+                                  ),
                                 ),
                                 Spacer(),
                                 Text(
@@ -579,41 +649,68 @@ class _ProjectState extends State<Project> {
                             child: Button(
                               text: "Mostrar Materiais",
                               func: () {
+                                Map<int, List<dynamic>> group = {};
+                                for (var item in materialsUsed) {
+                                  var id = item[0];
+                                  var name = item[1];
+                                  var quantity = item[2];
+                                  var price = item[3];
+
+                                  if (group.containsValue(id)) {
+                                    group[id]![2]++;
+                                    group[id]![3] += price;
+                                  } else {
+                                    group[int.parse(id)] = [
+                                      '$id',
+                                      name,
+                                      quantity,
+                                      price
+                                    ];
+                                  }
+                                }
+                                List<List<dynamic>> resultado =
+                                    group.values.toList();
                                 AppConfig().Bottom(
                                     context,
                                     'Materiais',
-                                    Column(
-                                      children: materialsUsed.map((material) {
-                                        return Container(
-                                          width: double.infinity,
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 20),
-                                          decoration: BoxDecoration(
-                                            border: Border(
-                                              bottom: BorderSide(
-                                                  width: 0.2,
-                                                  color:
-                                                      AppConfig().textColorW),
-                                            ),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Text(material[1]),
-                                              Spacer(),
-                                              Text(material[2]),
-                                              Text(' - '),
-                                              Text(
-                                                ((double.parse(material[3]) *
-                                                        double.parse(
-                                                            material[2]))
-                                                    .toStringAsFixed(2)),
-                                              ),
-                                              Text('€')
-                                            ],
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ));
+                                    materialsUsed.isNotEmpty
+                                        ? Column(
+                                            children:
+                                                materialsUsed.map((material) {
+                                              return Container(
+                                                width: double.infinity,
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 20),
+                                                decoration: BoxDecoration(
+                                                  border: Border(
+                                                    bottom: BorderSide(
+                                                        width: 0.2,
+                                                        color: AppConfig()
+                                                            .textColorW),
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Text(material[1]),
+                                                    Spacer(),
+                                                    Text(material[2]),
+                                                    Text(' - '),
+                                                    Text(
+                                                      ((double.parse(
+                                                                  material[3]) *
+                                                              double.parse(
+                                                                  material[2]))
+                                                          .toStringAsFixed(2)),
+                                                    ),
+                                                    Text('€')
+                                                  ],
+                                                ),
+                                              );
+                                            }).toList(),
+                                          )
+                                        : Center(
+                                            child: Text("Não há materiais."),
+                                          ));
                               },
                             ),
                           ),
@@ -628,7 +725,7 @@ class _ProjectState extends State<Project> {
                             ),
                           ),
                           Container(
-                            margin: const EdgeInsets.only(top: 10),
+                            margin: EdgeInsets.only(top: 10, bottom: 50),
                             width: double.infinity,
                             child: Button(
                               text: "Visitas",
@@ -638,6 +735,108 @@ class _ProjectState extends State<Project> {
                               },
                             ),
                           ),
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  Edit();
+                                },
+                                child: Icon(
+                                  Icons.edit_outlined,
+                                  color: Colors.amber,
+                                  size: 40,
+                                ),
+                              ),
+                              Spacer(),
+                              GestureDetector(
+                                  child: Icon(
+                                    archived == 0
+                                        ? Icons.archive_outlined
+                                        : Icons.unarchive_outlined,
+                                    color: Colors.green,
+                                    size: 40,
+                                  ),
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text("Confirmação"),
+                                          content: Text(archived == 0
+                                              ? "Tem certeza que deseja arquivar o projeto?"
+                                              : "Tem certeza que deseja desarquivar o projeto?"),
+                                          actions: [
+                                            TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text(
+                                                  "Não",
+                                                  style: TextStyle(
+                                                      color: AppConfig()
+                                                          .primaryColor),
+                                                )),
+                                            TextButton(
+                                                onPressed: () {
+                                                  ArchiveProject();
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text(
+                                                  "Sim",
+                                                  style: TextStyle(
+                                                      color: AppConfig()
+                                                          .primaryColor),
+                                                )),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  }),
+                              Spacer(),
+                              GestureDetector(
+                                onTap: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text("Confirmar"),
+                                          content: Text(
+                                              "Tem certeza que deseja remover o projeto?"),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text(
+                                                "Não",
+                                                style: TextStyle(
+                                                    color: AppConfig()
+                                                        .primaryColor),
+                                              ),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                DeleteProject();
+                                              },
+                                              child: Text(
+                                                "Sim",
+                                                style: TextStyle(
+                                                    color: AppConfig()
+                                                        .primaryColor),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      });
+                                },
+                                child: Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.red,
+                                  size: 40,
+                                ),
+                              ),
+                            ],
+                          )
                         ],
                       ),
                     ),

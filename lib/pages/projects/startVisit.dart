@@ -33,8 +33,8 @@ class _StartVisitState extends State<StartVisit> {
   List<String> eletrical_panel = [];
   List<String> eletrical_counter = [];
   List<List<String>> materials = [];
-  String instalation_tipology = "teste";
-  String client_tipology = "teste";
+  String instalation_tipology = "";
+  String client_tipology = "";
 
   Future<void> getInstallTypes() async {
     final url = Uri.parse('https://tze.ddns.net:8108/getInstallTipology.php');
@@ -94,7 +94,6 @@ class _StartVisitState extends State<StartVisit> {
             ),
           );
         });
-        print("Materiais: $materials");
       } catch (e) {
         print("Erro ao decodificar JSONsa: $e");
       }
@@ -138,12 +137,17 @@ class _StartVisitState extends State<StartVisit> {
       setState(() {
         uploading = true;
       });
+      print(materials);
+      materials.removeWhere((material) {
+        return material.contains('0');
+      });
+      print(materials);
       var request = http.MultipartRequest('POST', url);
-      request.fields['instalation_tipology'] = instalation_tipology;
-      request.fields['client_tipology'] = client_tipology;
+      request.fields['instalation_tipology'] = instalation_tipology != "" ? instalation_tipology : 'N/A';
+      request.fields['client_tipology'] = client_tipology != "" ? client_tipology : 'N/A';
       request.fields['project_id'] = widget.id.toString();
-      request.fields['name'] = visita.text;
-      request.fields['note'] = note.text;
+      request.fields['name'] = visita.text != "" ? visita.text : 'N/A';
+      request.fields['note'] = note.text != "" ? note.text : 'N/A';
       request.fields['materials'] = jsonEncode(materials);
       for (String external_house_files in external_house) {
         File file = File(external_house_files);
@@ -258,6 +262,7 @@ class _StartVisitState extends State<StartVisit> {
                           Container(
                             child: Column(
                               children: [
+                                !materials.isEmpty ? 
                                 Column(
                                     children: materials.map<Widget>((material) {
                                   return Container(
@@ -288,7 +293,6 @@ class _StartVisitState extends State<StartVisit> {
                                               initVal: int.parse(material[2]),
                                               onQtyChanged: (value) {
                                                 material[2] = value.toString();
-                                                print(materials);
                                               },
                                               decoration: QtyDecorationProps(
                                                 borderShape:
@@ -301,7 +305,7 @@ class _StartVisitState extends State<StartVisit> {
                                           )
                                         ],
                                       ));
-                                }).toList()),
+                                }).toList()) : Center(child: Text("Não há materiais disponíveis."),),
                               ],
                             ),
                           ),

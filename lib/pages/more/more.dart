@@ -40,23 +40,7 @@ class _MoreState extends State<More> {
               ),
             ToPage(page: Config(), pageLabel: "Definições"),
             ToPage(page: Account(), pageLabel: "Conta"),
-            ToPage(page: ProjectsFinished(), pageLabel: "Projetos"),
-            ToPage(page: About(), pageLabel: "Sobre"),
-            Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: Button(
-                text: "Sair",
-                func: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Login()),
-                  );
-                },
-                outlined: true,
-                colorChoose: Colors.red,
-              ),
-            ),
+            Spacer(),          
           ],
         ),
       ),

@@ -50,6 +50,28 @@ class _ViewVisitState extends State<ViewVisit> {
     }
   }
 
+  Future<void> DeleteVisit() async {
+    final url = Uri.parse('https://tze.ddns.net:8108/deleteVisit.php');
+    var request = http.MultipartRequest('POST', url);
+    request.fields['id'] = widget.id;
+    var streamResponse = await request.send();
+
+    final response = await http.Response.fromStream(streamResponse);
+    try {
+      print("Aqui");
+
+      if (response.statusCode == 200) {
+        print("Deu certo ${widget.id} ${response.body}");
+        Navigator.pop(context);
+        Navigator.pop(context, 'visit');
+      } else {
+        print('Erro: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erro na requisição: $e');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -77,7 +99,9 @@ class _ViewVisitState extends State<ViewVisit> {
       ),
       body: visitData == null
           ? Center(
-              child: CircularProgressIndicator(color: AppConfig().primaryColor,),
+              child: CircularProgressIndicator(
+                color: AppConfig().primaryColor,
+              ),
             )
           : SingleChildScrollView(
               child: Column(
@@ -217,7 +241,7 @@ class _ViewVisitState extends State<ViewVisit> {
                                         margin:
                                             const EdgeInsets.only(bottom: 10),
                                         child: Text(
-                                          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                                          visitData['NOTE'],
                                           style: const TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.w400),
@@ -364,33 +388,54 @@ class _ViewVisitState extends State<ViewVisit> {
                                   width: double.infinity,
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 20, vertical: 10),
-                                  child: Column(
+                                  child: Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Container(
-                                        margin:
-                                            const EdgeInsets.only(bottom: 5),
-                                        child: Text(
-                                          "Nota",
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w300,
-                                            color:
-                                                Color.fromARGB(255, 99, 99, 99),
-                                          ),
+                                      Spacer(),
+                                      GestureDetector(
+                                        onTap: () {
+                                          showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  title: Text("Confirmar"),
+                                                  content: Text(
+                                                      "Tem certeza que deseja remover o projeto?"),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        DeleteVisit();
+                                                      },
+                                                      child: Text(
+                                                        "Sim",
+                                                        style: TextStyle(
+                                                            color: AppConfig()
+                                                                .primaryColor),
+                                                      ),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text(
+                                                        "Não",
+                                                        style: TextStyle(
+                                                            color: AppConfig()
+                                                                .primaryColor),
+                                                      ),
+                                                    )
+                                                  ],
+                                                );
+                                              });
+                                        },
+                                        child: Icon(
+                                          Icons.delete_outline,
+                                          color: Colors.red,
+                                          size: 40,
                                         ),
                                       ),
-                                      Container(
-                                        margin:
-                                            const EdgeInsets.only(bottom: 10),
-                                        child: Text(
-                                          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-                                          style: const TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ),
+                                      Spacer()
                                     ],
                                   ),
                                 ),

@@ -67,60 +67,55 @@ class _AddMaterialState extends State<AddMaterial> {
         backgroundColor: Colors.transparent,
         iconTheme: IconThemeData(color: AppConfig().primaryColor),
       ),
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      body: Center(
         child: Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppConfig().radius),
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 20),
-                  decoration: BoxDecoration(
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppConfig().radius),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    decoration: BoxDecoration(
                       color: AppConfig().backgroundColor,
-                      borderRadius: BorderRadius.circular(AppConfig().radius)),
-                  child: SingleChildScrollView(
+                      borderRadius: BorderRadius.circular(AppConfig().radius),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            margin: const EdgeInsets.only(top: 10, bottom: 20),
-                            child: Center(
-                              child: Text(
-                                "Adicionar Material",
-                                style: TextStyle(
-                                    fontSize: 25, fontWeight: FontWeight.w600),
+                          Center(
+                            child: Text(
+                              "Adicionar Material",
+                              style: TextStyle(
+                                fontSize: 25,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
-                          Container(
-                            margin: const EdgeInsets.symmetric(vertical: 5),
-                            child: Input(
-                              label: "Material",
-                              controler: material_name,
-                            ),
+                          SizedBox(height: 20),
+                          Input(
+                            label: "Material",
+                            controler: material_name,
                           ),
-                          Container(
-                            margin: const EdgeInsets.symmetric(vertical: 5),
-                            child: Input(
-                              label: "Preço por unidade",
-                              controler: material_price,
-                              type: TextInputType.numberWithOptions(),
-                            ),
+                          SizedBox(height: 10),
+                          Input(
+                            label: "Preço por unidade",
+                            controler: material_price,
+                            type: TextInputType.numberWithOptions(),
                           ),
+                          SizedBox(height: 20),
                           Container(
-                            margin: const EdgeInsets.only(top: 20),
                             width: double.infinity,
                             child: Button(
                               loading: uploading,
-                              text: "Adcionar",
+                              text: "Adicionar",
                               func: () => Create(),
                             ),
                           ),
@@ -128,8 +123,8 @@ class _AddMaterialState extends State<AddMaterial> {
                       ),
                     ),
                   ),
-                )
-              ],
+                ],
+              ),
             ),
           ),
         ),
