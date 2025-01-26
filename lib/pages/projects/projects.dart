@@ -1,13 +1,14 @@
 import 'dart:convert';
 
-import 'package:eslar/components/button.dart';
-import 'package:eslar/pages/projects/project.dart';
+import 'package:Esolar/components/button.dart';
+import 'package:Esolar/pages/projects/project.dart';
 import 'package:flutter/material.dart';
-import 'package:eslar/components/AppConfig.dart';
+import 'package:Esolar/components/AppConfig.dart';
 import 'package:http/http.dart' as http;
 
 class Projects extends StatefulWidget {
-  const Projects({super.key});
+  String companyId;
+  Projects({super.key, required this.companyId});
 
   @override
   State<Projects> createState() => _ProjectsState();
@@ -45,9 +46,15 @@ class _ProjectsState extends State<Projects> {
     haveProjects = true;
     dataProject.clear();
     final url = Uri.parse("https://tze.ddns.net:8108/requestProjects.php");
-    final headers = {"Content-Type": "application/json"};
+    
+    
     try {
-      final response = await http.get(url, headers: headers);
+      var request = http.MultipartRequest('POST', url);
+      request.fields['companyId'] = widget.companyId;
+      
+      var streamResponse = await request.send();
+
+      final response = await http.Response.fromStream(streamResponse);
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         data = data['data'];

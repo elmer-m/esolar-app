@@ -1,13 +1,13 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:typed_data';
-import 'package:eslar/components/button.dart';
-import 'package:eslar/pages/projects/editProject.dart';
-import 'package:eslar/pages/projects/startVisit.dart';
-import 'package:eslar/pages/projects/viewVisit.dart';
+import 'package:Esolar/components/button.dart';
+import 'package:Esolar/pages/projects/editProject.dart';
+import 'package:Esolar/pages/projects/startVisit.dart';
+import 'package:Esolar/pages/projects/viewVisit.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:eslar/components/AppConfig.dart';
+import 'package:Esolar/components/AppConfig.dart';
 import 'dart:convert';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
@@ -174,26 +174,24 @@ class _ProjectState extends State<Project> {
                   ),
                 ),
               )
-            : Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: visits.map<Widget>(
-                      (visit) {
-                        return Container(
-                          margin: EdgeInsets.only(top: 10),
-                          width: double.infinity,
-                          child: Button(
-                            text: "Visita - ${visit['NAME']}",
-                            func: () {
-                              ViewVisitId(visit['ID'].toString());
-                            },
-                          ),
-                        );
-                      },
-                    ).toList(),
-                  ),
-                ),
+            : SingleChildScrollView(
+              child: Column(
+                children: visits.map<Widget>(
+                  (visit) {
+                    return Container(
+                      margin: EdgeInsets.only(top: 10),
+                      width: double.infinity,
+                      child: Button(
+                        text: "Visita - ${visit['NAME']}",
+                        func: () {
+                          ViewVisitId(visit['ID'].toString());
+                        },
+                      ),
+                    );
+                  },
+                ).toList(),
               ),
+            ),
       ),
     );
     setState(() {

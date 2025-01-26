@@ -1,13 +1,16 @@
 import 'dart:convert';
 
-import 'package:eslar/pages/projects/project.dart';
+import 'package:Esolar/pages/projects/project.dart';
 import 'package:flutter/material.dart';
-import 'package:eslar/components/AppConfig.dart';
+import 'package:Esolar/components/AppConfig.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  String userFirstName;
+  String companyName;
+  String companyId;
+  Home({super.key, required this.userFirstName, required this.companyName, required this.companyId});
 
   @override
   State<Home> createState() => _HomeState();
@@ -34,7 +37,7 @@ class _HomeState extends State<Home> {
   Future<void> loadUser() async {
     userData = {
       'firstName': '',
-      'lastName': '',
+      'company': '',
     };
 
     final prefs = await SharedPreferences.getInstance();
@@ -42,6 +45,7 @@ class _HomeState extends State<Home> {
     print(user);
     setState(() {
       userData['firstName'] = user![0];
+      userData['company'] = user[4];
     });
   }
 
@@ -68,10 +72,17 @@ class _HomeState extends State<Home> {
   Future<void> getProjects() async {
     dataProject.clear();
     final url = Uri.parse("https://tze.ddns.net:8108/requestProjects.php");
-    final headers = {"Content-Type": "application/json"};
+    
+    
     try {
-      final response = await http.get(url, headers: headers);
+      var request = http.MultipartRequest('POST', url);
+      request.fields['companyId'] = widget.companyId;
+      
+
+      var streamResponse = await request.send();
+      final response = await http.Response.fromStream(streamResponse);
       if (response.statusCode == 200) {
+      print("Company id ${response.body}");
         var data = jsonDecode(response.body);
         data = data['data'];
         setState(() {
@@ -119,7 +130,7 @@ class _HomeState extends State<Home> {
                     margin: const EdgeInsets.only(top: 10),
                     width: double.infinity,
                     child: Text(
-                      "Olá " + userData['firstName']!,
+                      "Olá " + widget.userFirstName,
                       style: TextStyle(
                           color: AppConfig().textColorW,
                           fontWeight: FontWeight.bold,
@@ -140,7 +151,7 @@ class _HomeState extends State<Home> {
                             fontSize: 25,
                           ),
                         ),
-                        Text("Escolha Solar",
+                        Text(widget.companyName,
                             style: TextStyle(
                                 color: AppConfig().primaryColor,
                                 fontWeight: FontWeight.bold,
@@ -236,13 +247,14 @@ class _HomeState extends State<Home> {
                                                         size: 15,
                                                       ),
                                                     ),
-                                                    Text(
+                                                    Expanded(
+                                                        child: Text(
                                                       "${project['LOCATION'].toString()}, ${project['ADDRESS'].toString()}",
                                                       style: TextStyle(
                                                         color: AppConfig()
                                                             .textColorW,
                                                       ),
-                                                    )
+                                                    ))
                                                   ],
                                                 ),
                                               ),

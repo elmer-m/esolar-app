@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:eslar/pages/auth/register.dart';
-import 'package:eslar/pages/dashboard.dart';
+import 'package:Esolar/pages/auth/register.dart';
+import 'package:Esolar/pages/dashboard.dart';
 import 'package:flutter/material.dart';
-import 'package:eslar/components/input.dart';
-import 'package:eslar/components/AppConfig.dart';
+import 'package:Esolar/components/input.dart';
+import 'package:Esolar/components/AppConfig.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,6 +19,7 @@ class _LoginState extends State<Login> {
   bool Loading = false;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController licenseKey = TextEditingController();
   bool invalidData = false;
   String errorText = "";
   Future<void> Entrar() async {
@@ -34,6 +35,7 @@ class _LoginState extends State<Login> {
     final body = jsonEncode({
       'email': emailController.text,
       'password': passwordController.text,
+      'key': licenseKey.text,
     });
     if (passwordController.text.length < 8) {
       setState(() {
@@ -66,7 +68,7 @@ class _LoginState extends State<Login> {
             });
           } else if (data['status'] == 0) {
             print(data['user']);
-            saveUser(data['user']);
+            saveUser(data['user'], data['company']);
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
@@ -84,12 +86,14 @@ class _LoginState extends State<Login> {
     }
   }
 
-  Future<void> saveUser(userData) async {
+  Future<void> saveUser(userData, companyData) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> userInfo = [];
     userInfo.add(userData['firstName']);
     userInfo.add(userData['lastName']);
     userInfo.add(userData['email']);
+    userInfo.add(companyData['id'].toString());
+    userInfo.add(companyData['name']);
     await prefs.setStringList('userData', userInfo);
     print("Salvo");
   }
@@ -125,17 +129,25 @@ class _LoginState extends State<Login> {
                         Container(
                           margin: const EdgeInsets.only(top: 20),
                           child: Input(
-                            label: "Email",
+                            label: "Id",
                             controler: emailController,
-                            type: TextInputType.emailAddress,
+                            type: TextInputType.text,
                           ),
                         ),
                         Container(
-                          margin: const EdgeInsets.only(top: 20, bottom: 10),
+                          margin: const EdgeInsets.only(top: 20),
                           child: Input(
                               hiddeChar: true,
                               label: "Palavra-Passe",
                               controler: passwordController),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.only(top: 20, bottom: 20),
+                          child: Input(
+                            label: "Chave de Licença",
+                            controler: licenseKey,
+                            type: TextInputType.text,
+                          ),
                         ),
                         Visibility(
                           visible: invalidData,

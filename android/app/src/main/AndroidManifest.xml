@@ -1,4 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Adiciona permissão para acesso à internet -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Adiciona permissão para acessar o estado da rede (opcional) -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
     <application
         android:label="eslar"
         android:name="${applicationName}"

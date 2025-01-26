@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:eslar/components/sendAttachment.dart';
+import 'package:Esolar/components/sendAttachment.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
-import 'package:eslar/components/button.dart';
-import 'package:eslar/components/input.dart';
+import 'package:Esolar/components/button.dart';
+import 'package:Esolar/components/input.dart';
 import 'package:flutter/material.dart';
 import 'package:input_quantity/input_quantity.dart';
 import 'package:intl/intl.dart';
-import 'package:eslar/components/AppConfig.dart';
-import 'package:eslar/components/dropDown.dart';
+import 'package:Esolar/components/AppConfig.dart';
+import 'package:Esolar/components/dropDown.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 class StartVisit extends StatefulWidget {

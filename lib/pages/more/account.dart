@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:eslar/components/AppConfig.dart';
-import 'package:eslar/components/button.dart';
-import 'package:eslar/components/input.dart';
-import 'package:eslar/pages/auth/login.dart';
+import 'package:Esolar/components/AppConfig.dart';
+import 'package:Esolar/components/button.dart';
+import 'package:Esolar/components/input.dart';
+import 'package:Esolar/pages/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -115,98 +115,96 @@ class _AccountState extends State<Account> {
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppConfig().radius),
               color: AppConfig().overlayColor),
-          child: Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 30),
+                        child: Text(
+                          "Conta",
+                          style: TextStyle(
+                              color: AppConfig().textColorW,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 40),
+                        ),
+                      ),
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () {
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Confirmação"),
+                                  content: Text(
+                                      "Tem certeza que deseja sair da conta?"),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Não", style: TextStyle(color: AppConfig().primaryColor),)),
+                                    TextButton(
+                                        onPressed: () {
+                                          deleteUser();
+                                          Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => Login(),
+                                            ),
+                                            (Route<dynamic> route) => false,
+                                          );
+                                        },
+                                        child: Text("Sim", style: TextStyle(color: AppConfig().primaryColor),)),
+                                  ],
+                                );
+                              });
+                        },
+                        child: Container(
+                          child: Icon(
+                            Icons.power_settings_new,
+                            color: Colors.red,
+                            size: 40,
+                          ),
+                          margin: const EdgeInsets.only(bottom: 30),
+                        ),
+                      )
+                    ],
+                  ),
+                  Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(AppConfig().radius),
+                      color: AppConfig().backgroundColor,
+                    ),
+                    child: Column(
                       children: [
                         Container(
-                          margin: const EdgeInsets.only(bottom: 30),
-                          child: Text(
-                            "Conta",
-                            style: TextStyle(
-                                color: AppConfig().textColorW,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 40),
-                          ),
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Input(label: "Nome", controler: name),
                         ),
-                        Spacer(),
-                        GestureDetector(
-                          onTap: () {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text("Confirmação"),
-                                    content: Text(
-                                        "Tem certeza que deseja sair da conta?"),
-                                    actions: [
-                                      TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text("Não", style: TextStyle(color: AppConfig().primaryColor),)),
-                                      TextButton(
-                                          onPressed: () {
-                                            deleteUser();
-                                            Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => Login(),
-                                              ),
-                                              (Route<dynamic> route) => false,
-                                            );
-                                          },
-                                          child: Text("Sim", style: TextStyle(color: AppConfig().primaryColor),)),
-                                    ],
-                                  );
-                                });
-                          },
-                          child: Container(
-                            child: Icon(
-                              Icons.power_settings_new,
-                              color: Colors.red,
-                              size: 40,
-                            ),
-                            margin: const EdgeInsets.only(bottom: 30),
+                        Container(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Input(label: "Email", controler: email),
+                        ),
+                        Container(
+                          child: Button(
+                            text: "Guardar",
+                            func: () => Edit(),
                           ),
+                          width: double.infinity,
                         )
                       ],
                     ),
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(AppConfig().radius),
-                        color: AppConfig().backgroundColor,
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            child: Input(label: "Nome", controler: name),
-                          ),
-                          Container(
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            child: Input(label: "Email", controler: email),
-                          ),
-                          Container(
-                            child: Button(
-                              text: "Guardar",
-                              func: () => Edit(),
-                            ),
-                            width: double.infinity,
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                ),
+                  )
+                ],
               ),
             ),
           )),

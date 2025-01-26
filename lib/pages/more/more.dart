@@ -1,12 +1,12 @@
-import 'package:eslar/components/button.dart';
-import 'package:eslar/components/toPage.dart';
-import 'package:eslar/pages/auth/login.dart';
-import 'package:eslar/pages/more/about.dart';
-import 'package:eslar/pages/more/config.dart';
-import 'package:eslar/pages/more/account.dart';
-import 'package:eslar/pages/more/projectsFinisheds.dart';
+import 'package:Esolar/components/button.dart';
+import 'package:Esolar/components/toPage.dart';
+import 'package:Esolar/pages/auth/login.dart';
+import 'package:Esolar/pages/more/about.dart';
+import 'package:Esolar/pages/more/config.dart';
+import 'package:Esolar/pages/more/account.dart';
+import 'package:Esolar/pages/more/projectsFinisheds.dart';
 import 'package:flutter/material.dart';
-import 'package:eslar/components/AppConfig.dart';
+import 'package:Esolar/components/AppConfig.dart';
 
 class More extends StatefulWidget {
   const More({super.key});

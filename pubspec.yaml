@@ -1,5 +1,5 @@
-name: eslar
-description: "A new Flutter project."
+name: Esolar
+description: "App de gestão."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -39,7 +39,11 @@ dependencies:
   shared_preferences: ^2.3.4
   flutter:
     sdk: flutter
-
+  flutter_local_notifications: ^18.0.1
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logoApk.png"
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

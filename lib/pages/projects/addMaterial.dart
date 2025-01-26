@@ -1,16 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:eslar/components/dropDown.dart';
-import 'package:eslar/components/sendAttachment.dart';
-import 'package:eslar/pages/projects/project.dart';
+import 'package:Esolar/components/dropDown.dart';
+import 'package:Esolar/components/sendAttachment.dart';
+import 'package:Esolar/pages/projects/project.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
-import 'package:eslar/components/button.dart';
-import 'package:eslar/components/input.dart';
+import 'package:Esolar/components/button.dart';
+import 'package:Esolar/components/input.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:eslar/components/AppConfig.dart';
+import 'package:Esolar/components/AppConfig.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
@@ -39,6 +39,7 @@ class _AddMaterialState extends State<AddMaterial> {
       final response = await http.Response.fromStream(streamResponse);
       if (response.statusCode == 200) {
         print("Deu certo:  ${response.body}");
+        Navigator.pop(context);
       } else {
         print("Deu errado, erro: ${response.statusCode}");
       }

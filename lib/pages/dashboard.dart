@@ -1,13 +1,14 @@
-import 'package:eslar/components/toPage.dart';
-import 'package:eslar/pages/more/more.dart';
-import 'package:eslar/pages/projects/addMaterial.dart';
-import 'package:eslar/pages/projects/addProject.dart';
-import 'package:eslar/pages/home.dart';
-import 'package:eslar/pages/auth/login.dart';
-import 'package:eslar/pages/projects/projects.dart';
-import 'package:eslar/pages/auth/register.dart';
+import 'package:Esolar/components/toPage.dart';
+import 'package:Esolar/pages/more/more.dart';
+import 'package:Esolar/pages/projects/addMaterial.dart';
+import 'package:Esolar/pages/projects/addProject.dart';
+import 'package:Esolar/pages/home.dart';
+import 'package:Esolar/pages/auth/login.dart';
+import 'package:Esolar/pages/projects/projects.dart';
+import 'package:Esolar/pages/auth/register.dart';
 import 'package:flutter/material.dart';
-import 'package:eslar/components/AppConfig.dart';
+import 'package:Esolar/components/AppConfig.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -18,12 +19,36 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   int selectedIndex = 0;
+  List<String> userData = [];
+  List<Widget> pages = [];
+  bool loading = true;
 
-  static const List<Widget> pages = <Widget>[
-    Home(),
-    Projects(),
-    More(),
-  ];
+  Future<void> loadUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final user = await prefs.getStringList('userData');
+    print(user);
+    setState(() {
+      userData.add(user![0]);
+      userData.add(user[4]);
+      userData.add(user[3]);
+    });
+    loading = false;
+    pages = [
+      Home(
+        userFirstName: userData[0],
+        companyName: userData[1],
+        companyId: userData[2],
+      ),
+      Projects(companyId: userData[2],),
+      More(),
+    ];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadUser();
+  }
 
   void onItemTapped(i) {
     setState(() {
@@ -34,7 +59,7 @@ class _DashboardState extends State<Dashboard> {
   Future<void> GoProject() async {
     print("ativou a função");
     var result = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const AddProject()));
+        context, MaterialPageRoute(builder: (context) => AddProject(companyId: userData[2],)));
     if (result != null) {
       setState(
         () {
@@ -57,9 +82,8 @@ class _DashboardState extends State<Dashboard> {
                     Container(
                       child: Column(
                         children: [
-                          ToPage(page: AddProject(), pageLabel: "Projeto"),
+                          ToPage(page: AddProject(companyId: userData[2],), pageLabel: "Projeto"),
                           ToPage(page: AddMaterial(), pageLabel: "Material")
-                          
                         ],
                       ),
                     ));
@@ -68,13 +92,15 @@ class _DashboardState extends State<Dashboard> {
               child: Icon(Icons.add),
             )
           : null,
-      body: Container(
-        child: Column(
-          children: [
-            pages[selectedIndex],
-          ],
-        ),
-      ),
+      body: loading
+          ? Container()
+          : Container(
+              child: Column(
+                children: [
+                  pages[selectedIndex],
+                ],
+              ),
+            ),
       bottomNavigationBar: Container(
         width: double.infinity,
         decoration: BoxDecoration(

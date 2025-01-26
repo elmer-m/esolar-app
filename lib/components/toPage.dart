@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:eslar/components/AppConfig.dart';
+import 'package:Esolar/components/AppConfig.dart';
 
 class ToPage extends StatelessWidget {
   final Widget page;

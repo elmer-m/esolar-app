@@ -1,6 +1,6 @@
-import 'package:eslar/components/toPage.dart';
+import 'package:Esolar/components/toPage.dart';
 import 'package:flutter/material.dart';
-import 'package:eslar/components/AppConfig.dart';
+import 'package:Esolar/components/AppConfig.dart';
 
 class About extends StatelessWidget {
   const About({super.key});

@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:eslar/components/AppConfig.dart';
+import 'package:Esolar/components/AppConfig.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class Attachment extends StatefulWidget {

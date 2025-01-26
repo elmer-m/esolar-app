@@ -1,10 +1,10 @@
-import 'package:eslar/pages/auth/register.dart';
-import 'package:eslar/pages/dashboard.dart';
-import 'package:eslar/pages/projects/addProject.dart';
+import 'package:Esolar/pages/auth/register.dart';
+import 'package:Esolar/pages/dashboard.dart';
+import 'package:Esolar/pages/projects/addProject.dart';
 import 'package:flutter/material.dart';
-import 'package:eslar/pages/auth/login.dart';
-import 'package:eslar/pages/projects/startVisit.dart';
-import 'package:eslar/components/button.dart';
+import 'package:Esolar/pages/auth/login.dart';
+import 'package:Esolar/pages/projects/startVisit.dart';
+import 'package:Esolar/components/button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:eslar/components/AppConfig.dart';
+import 'package:Esolar/components/AppConfig.dart';
 
 class Button extends StatefulWidget {
   final String text;

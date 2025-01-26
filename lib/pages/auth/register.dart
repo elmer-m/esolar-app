@@ -1,12 +1,12 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-import 'package:eslar/components/button.dart';
-import 'package:eslar/pages/auth/login.dart';
-import 'package:eslar/pages/dashboard.dart';
+import 'package:Esolar/components/button.dart';
+import 'package:Esolar/pages/auth/login.dart';
+import 'package:Esolar/pages/dashboard.dart';
 import 'package:flutter/material.dart';
-import 'package:eslar/components/input.dart';
-import 'package:eslar/components/AppConfig.dart';
+import 'package:Esolar/components/input.dart';
+import 'package:Esolar/components/AppConfig.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -77,13 +77,6 @@ class _RegisterState extends State<Register> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: AppConfig().overlayColor,
-        appBar: AppBar(
-          iconTheme: IconThemeData(
-            color: AppConfig().primaryColor,
-          ),
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-        ),
         body: Center(
           child: SingleChildScrollView(
             child: Center(

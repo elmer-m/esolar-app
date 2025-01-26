@@ -2,12 +2,12 @@
 
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:eslar/components/button.dart';
-import 'package:eslar/components/seeFiles.dart';
+import 'package:Esolar/components/button.dart';
+import 'package:Esolar/components/seeFiles.dart';
 import 'startVisit.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:eslar/components/AppConfig.dart';
+import 'package:Esolar/components/AppConfig.dart';
 import 'dart:convert';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
@@ -401,8 +401,19 @@ class _ViewVisitState extends State<ViewVisit> {
                                                 return AlertDialog(
                                                   title: Text("Confirmar"),
                                                   content: Text(
-                                                      "Tem certeza que deseja remover o projeto?"),
+                                                      "Tem certeza que deseja remover a visita?"),
                                                   actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text(
+                                                        "Não",
+                                                        style: TextStyle(
+                                                            color: AppConfig()
+                                                                .primaryColor),
+                                                      ),
+                                                    ),
                                                     TextButton(
                                                       onPressed: () {
                                                         DeleteVisit();
@@ -414,17 +425,6 @@ class _ViewVisitState extends State<ViewVisit> {
                                                                 .primaryColor),
                                                       ),
                                                     ),
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: Text(
-                                                        "Não",
-                                                        style: TextStyle(
-                                                            color: AppConfig()
-                                                                .primaryColor),
-                                                      ),
-                                                    )
                                                   ],
                                                 );
                                               });
